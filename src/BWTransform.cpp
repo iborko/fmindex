@@ -19,3 +19,21 @@ std::string BWTransform::transform(const std::string& s) {
 
     return result;
 }
+
+std::string BWTransform::reverse(
+    const std::string& bwt_text,
+    const OccurrenceTableInterface& occ_table,
+    const PrefixSumTableInterface& ps_table) {
+
+    std::string original_reversed;
+    int pos = 0;
+    for(size_t i = 0; i < bwt_text.size() - 1; i++) {
+        char c = bwt_text[pos];
+        original_reversed.push_back(c);
+        // L-F mapping to get new position
+        pos = ps_table.get_C(c) + occ_table.get_occ(c, pos);
+    }
+
+    std::reverse(original_reversed.begin(), original_reversed.end());
+    return original_reversed;
+}
