@@ -5,7 +5,6 @@
 #include "../include/BWTransform.h"
 #include "../include/PrefixSumTable.h"
 #include "../include/OccurrenceTable.h"
-#include "../include/SuffixArray.h"
 
 int main() {
     std::string my = "AGATTAT$";
@@ -13,8 +12,6 @@ int main() {
     std::string bwt = BWTransform::transform(my);
     std::cout << "Original :" << my << std::endl;
     std::cout << "Transformed :" << bwt << std::endl;
-
-    int * sa = SuffixArray::get_sa(my, strlen(my.c_str()));
 
     PrefixSumTableInterface* ps_table = new PrefixSumTable(bwt);
     OccurrenceTableInterface* occ_table = new OccurrenceTable(bwt);
