@@ -36,10 +36,8 @@ class BitStringRank(object):
         """
         super(BitStringRank, self).__init__()
 
-        if isinstance(string, str):
-            string = np.array(list(string), dtype=np.int)
-        self.string = string > 0
-        self.n = self.string.size
+        self.string = [bool(c) for c in string]
+        self.n = len(string)
         self.l = l
 
         #   create the buckets

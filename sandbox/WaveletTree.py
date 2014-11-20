@@ -10,6 +10,40 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def calc_pivot(alph, counts):
+    """
+    Calculates the ideal pivot given an
+    alphabeth and character counts.
+
+    The ideal pivot is such that will give
+    the least difference of the number of characters
+    that are less then pivot and those that are
+    greater or equal to the pivot.
+
+    :param alph: All the characters
+        in the string, ***sorted ascending***.
+
+    :param counts: A dict of characters
+        to their counts in the string.
+    """
+    scores = np.zeros(len(alph))
+    for ind, char in enumerate(alph):
+
+        #   calculate the number of 0s and 1s
+        sum_before = sum([counts[c] for c in alph[:ind]])
+        sum_after = sum([counts[c] for c in alph[ind:]])
+
+        #   calculate diff between numbers of 0s and 1s
+        scores[ind] = abs(sum_before - sum_after)
+
+        #   if current score is worse then prev, then prev is
+        #   the best, continuing will only give worse scores
+        if (ind > 0) & (scores[ind] > scores[ind - 1]):
+            return alph[ind - 1]
+
+    return alph[-1]
+
+
 class WaveletTree(object):
     """
     A binary wavelet tree. It's purpose is to
@@ -31,52 +65,61 @@ class WaveletTree(object):
         super(WaveletTree, self).__init__()
 
         #   get the string alphabet
-        self.alphabet = sorted(set(string))
+        alph = sorted(set(string))
 
-        #   convert the string to alphabet indices
-        assert len(self.alphabet) <= (1 << 7)
-        int_string = np.array(
-            [self.alphabet.index(x) for x in string], np.uint8)
+        #   get char counts in the string
+        counts = dict(zip(alph, [0] * len(alph)))
+        for c in string:
+            counts[c] += 1
 
         #   construct a binary Wavelet tree
         #   each node is a tuple of form
         #       (pivot, BitStringRank, left-child, right-child)
-        def create_node(string, alphabet):
+        def create_node(string, alph, counts):
 
-            #   if alphabet consists of less then 2 characters
+            #   if alph consists of less then 2 characters
             #   then there is no need for this node
-            if len(alphabet) < 2:
+            if len(alph) < 2:
                 return None
 
-            #   first look for the character that gives the
-            #   best node balance (similar number of 0s and 1s)
-            median = int(round(np.median(string)))
-            pivots = (median - 1, median, median + 1)
-            bitstrings = [string >= c for c in pivots]
+            #   we'll need this a lot
+            str_len = len(string)
 
-            #   best pivot is one that gives the least deviation
-            #   from (string_size / 2)
-            best_ind = np.argmin(
-                [(sum(c) - (string.size / 2)) ** 2 for c in bitstrings])
+            #   get the optimal pivot for this node
+            pivot = calc_pivot(alph, counts)
 
-            #   found the best balancing pivot, use it
-            pivot = pivots[best_ind]
-            bitstring = bitstrings[best_ind]
+            #   create the bitstring (and it's inverse)
+            bitstring = [c >= pivot for c in string]
 
-            #   create left and right nodes
-            #   first see which alphabets they consist of
-            left_alphabet = alphabet[:alphabet.index(pivot)]
-            right_alphabet = alphabet[alphabet.index(pivot):]
-            #   then create the actual nodes
-            left_node = create_node(
-                string[np.logical_not(bitstring)], left_alphabet)
-            right_node = create_node(
-                string[bitstring], right_alphabet)
+            #   create strings for each node
+            #   determine their sizes based on bitstring rank
+            bistring_rank = BitStringRank(bitstring, l)
+            right_string = [0] * bistring_rank.rank(str_len)
+            left_string = [0] * (str_len - len(right_string))
+
+            #   populate strings for each node with appropriate values
+            left_ind = 0
+            right_ind = 0
+            for c in string:
+                if c >= pivot:
+                    right_string[right_ind] = c
+                    right_ind += 1
+                else:
+                    left_string[left_ind] = c
+                    left_ind += 1
+
+            #   calculate the alphabeths for both nodes
+            left_alph = alph[:alph.index(pivot)]
+            right_alph = alph[alph.index(pivot):]
+
+            #   create the actual nodes
+            left_node = create_node(left_string, left_alph, counts)
+            right_node = create_node(right_string, right_alph, counts)
 
             #   return this node
-            return (pivot, BitStringRank(bitstring, l), left_node, right_node)
+            return (pivot, bistring_rank, left_node, right_node)
 
-        self.root = create_node(int_string, range(len(self.alphabet)))
+        self.root = create_node(string, alph, counts)
 
     def rank(self, c, i):
         """
@@ -90,10 +133,6 @@ class WaveletTree(object):
             is sought.
         """
 
-        #   we use an integer alphabet, so convert
-        int_c = self.alphabet.index(c)
-        log.debug('Rank for %c(%d), %d', c, int_c, i)
-
         #   go down the tree
         node = self.root
 
@@ -105,15 +144,15 @@ class WaveletTree(object):
             rank = node[1].rank(rank_prev)
 
             #   check if c is less then pivot
-            if int_c < node[0]:
+            if c < node[0]:
                 #   we need the count of zeros
                 rank = rank_prev - rank
-                log.debug('Rank in node (left) (%d) = %d', node[0], rank)
+                log.debug('Rank in node (left) (%c) = %d', node[0], rank)
                 node = node[2]
 
             #   c is greater or equal to pivot
             else:
-                log.debug('Rank in node (right) (%d) = %d', node[0], rank)
+                log.debug('Rank in node (right) (%c) = %d', node[0], rank)
                 node = node[3]
 
         return rank
