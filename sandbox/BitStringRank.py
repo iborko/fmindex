@@ -79,9 +79,11 @@ class BitStringRank(object):
         :param i: See above.
         """
         assert i <= self.n
-        index = max(0, i - 1)
 
-        bucket_ind = index / self.l
+        if i == 0:
+            return 0
+
+        bucket_ind = i / self.l
         superbucket_ind = bucket_ind / self.l
         return self.superbuckets[superbucket_ind] + \
             self.buckets[bucket_ind] + \

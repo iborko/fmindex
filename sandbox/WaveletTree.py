@@ -108,6 +108,9 @@ class WaveletTree(object):
                     left_string[left_ind] = c
                     left_ind += 1
 
+            #   we don't need the original string anymore, release memory
+            del string
+
             #   calculate the alphabeths for both nodes
             left_alph = alph[:alph.index(pivot)]
             right_alph = alph[alph.index(pivot):]
