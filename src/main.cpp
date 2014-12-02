@@ -14,8 +14,6 @@ int main() {
     std::cout << "Original :" << my << std::endl;
     std::cout << "Transformed :" << bwt << std::endl;
 
-    int * sa = SuffixArray::get_sa(my, strlen(my.c_str()));
-
     PrefixSumTableInterface* ps_table = new PrefixSumTable(bwt);
     OccurrenceTableInterface* occ_table = new OccurrenceTable(bwt);
     std::string orig = BWTransform::reverse(bwt, *occ_table, *ps_table);
