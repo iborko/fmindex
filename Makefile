@@ -1,5 +1,5 @@
 # Makefile
-#    WARNING: lines must start with tabs instead of tabs
+#    WARNING: lines must start with tabs instead of spaces
 
 CC := g++ # This is the main compiler
 # CC := clang --analyze # and comment out the linker last line for sanity
