@@ -25,51 +25,52 @@ class BitStringRank(object):
     and including the index.
     """
 
-    def __init__(self, string, l):
+    def __init__(self, string, bucket_size):
         """
         Creates the BitStringRank object.
 
         :param string: An iterable consisting of 0s and 1s,
             can be numeric or text.
 
-        :param l: Bucket size.
+        :param bucket_size: Bucket size.
         """
         super(BitStringRank, self).__init__()
+        assert(bucket_size > 1)
 
         self.string = [bool(c) for c in string]
         self.n = len(string)
-        self.l = l
+        self.bucket_size = bucket_size
+        superbucket_size = bucket_size ** 2
 
         #   create the buckets
-        self.buckets = np.zeros(self.n / l + 1, np.uint8)
-        self.superbuckets = np.zeros(self.n / l ** 2 + 1, np.int)
+        self.buckets = np.zeros(self.n / bucket_size + 1, np.uint8)
+        self.superbuckets = np.zeros(self.n / bucket_size ** 2 + 1, np.int)
 
         #   populate the buckets with values
         current_sum = 0
         #   iterate through the string
         for ind, value in enumerate(self.string):
 
-            #   if we are entering a new bucket
-            #   then store the results
-            if (ind % l == 0) & (ind != 0):
+            #   increment current sum
+            current_sum += value
 
-                #   indexes of bucket and superbucket
-                #   for current index
-                bucket_ind = ind / self.l
-                superbucket_ind = bucket_ind / self.l
+            #   when at the last element of the current bucket
+            #   update the next bucket's size
+            if (ind % bucket_size == (bucket_size - 1)):
+
+                #   index of the next bucket
+                bucket_ind = ind / self.bucket_size + 1
+                #   index of the superbucket the next bucket belongs to
+                superbucket_ind = bucket_ind / self.bucket_size
 
                 #   update superbucket when crossing
                 #   the superbucket boundary
-                if ind % l ** 2 == 0:
+                if ind % superbucket_size == (superbucket_size - 1):
                     self.superbuckets[superbucket_ind] = current_sum
 
-                #   update the bucket relative to the current
-                #   superbucket
+                #   update the bucket relative to it's superbucket
                 self.buckets[bucket_ind] = current_sum - \
                     self.superbuckets[superbucket_ind]
-
-            #   increment current sum
-            current_sum += value
 
     def rank(self, i):
         """
@@ -78,13 +79,10 @@ class BitStringRank(object):
 
         :param i: See above.
         """
-        assert i <= self.n
+        assert (i >= 0) & (i <= self.n)
 
-        if i == 0:
-            return 0
-
-        bucket_ind = i / self.l
-        superbucket_ind = bucket_ind / self.l
+        bucket_ind = i / self.bucket_size
+        superbucket_ind = bucket_ind / self.bucket_size
         return self.superbuckets[superbucket_ind] + \
             self.buckets[bucket_ind] + \
-            sum(self.string[bucket_ind * self.l: i])
+            sum(self.string[bucket_ind * self.bucket_size: i])
