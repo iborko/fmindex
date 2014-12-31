@@ -22,6 +22,12 @@ public:
         const std::string& bwt_text,
         const OccurrenceTableInterface& occ_table,
         const PrefixSumTableInterface& ps_table);
+    static std::vector<int> search(
+            const std::string& pattern,
+            const std::vector<int>& alph,
+            const int * sa,
+            const OccurrenceTableInterface& occ_table,
+            const PrefixSumTableInterface& ps_table);
 };
 
 #endif

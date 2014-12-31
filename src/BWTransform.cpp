@@ -37,3 +37,46 @@ std::string BWTransform::reverse(
     std::reverse(original_reversed.begin(), original_reversed.end());
     return original_reversed;
 }
+
+std::vector<int>  BWTransform::search(
+        const std::string& pattern,
+        const std::vector<int>& alph,
+        const int * sa,
+        const OccurrenceTableInterface& occ_table,
+        const PrefixSumTableInterface& ps_table) {
+
+    //counting phase
+    int i = pattern.size() - 1;
+    char c = pattern[i];
+
+    std::vector<int>::const_iterator it = std::find(alph.begin(), alph.end(), c);
+
+    int sp = ps_table.get_C(c);
+    int ep;
+
+    if (it == alph.end() - 1){
+        ep = sizeof(sa);
+    }
+    else{
+        ep = ps_table.get_C(char(*(++it)));
+    }
+
+    while (sp <= ep && i >= 1){
+        c = pattern[i - 1];
+
+        sp = ps_table.get_C(c) + occ_table.get_occ(c, sp);
+        ep = ps_table.get_C(c) + occ_table.get_occ(c, ep);
+
+        i--;
+
+    }
+
+    //localizing phase
+    std::vector<int> occ_indices;
+
+    for (size_t i = sp; i < ep; i++){
+        occ_indices.push_back(sa[i]);
+    }
+
+    return occ_indices;
+}
