@@ -15,7 +15,7 @@ def main():
     Unit testing for the BitStringRank class.
     """
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     log.info('Testing BitStringRank')
 
     #   this is for manual checking of buckets
