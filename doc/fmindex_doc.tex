@@ -1,0 +1,113 @@
+\documentclass[times, utf8, seminar, numeric]{fer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{currvita}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+
+
+% definicija jezika koji nema nista, pa se nista ne naglasava
+% koristi se za troadresni kod, ispise tokena i slicno
+\lstdefinelanguage{blank}{
+	sensitive=false, 
+	morecomment=[l]{;},
+}
+
+% koristimo zadebljane vektore, a ne strelice
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% neke boje koje koristimo u formatiranju ispisa
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mylightgray}{rgb}{0.95,0.95,0.95}
+
+% definicija formatiranja ispisa, ponesto promjenjena u odnosu na pretpostavljenu
+\lstset{ %
+  backgroundcolor=\color{mylightgray},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize\ttfamily,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=none,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=c,           	       % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=none,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{red},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\title{Implementacija FM-index algoritma}
+
+\author{Ivan Borko, Sofia Čolaković, Florijan Stamenković}
+
+\voditelj{doc. dr. sc. Mirjana Domazet Lošo}
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Uvod i problematika}
+
+Pretraživanje teksta česta je praktična potreba mnogih informacijskih sustava.
+Pod terminom "pretraživanje teksta" podrazumijevamo pronalazak svih pojavljivanja
+nekog niza znakova $Q$ \engl{query} unutar drugog niza znakova $S$ \engl{string}.
+Tipično se rezultat pretraživanja $R$
+formulira kao niz indeksa (rednog broja znaka) unutar niza $S$ na kojem počinje pojavljivanje
+niza $Q$. Primjerice, za niz $S =$ \textit{"Žuti pas je opasan kad je opasan remenom oko pasa"}
+i niz $Q =$ \textit{"pas"} rezultati
+pretraživanja bili bi $R = \{6, 14, 28, 46\}$.
+
+U području bioinformatike pretraživanje teksta koristi se u za pronalazak
+specifičnih sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
+bioinformatičkog pretraživanja jest da su nizovi koji se pretražuju iznimno velike duljine.
+Primjerice, ljudski genom tipično sadrži oko $3.3 \times 10^9$ znakova, što bi otisnuto na
+A4 stranice fontom veličine 10pt rezultiralo s otprilike milijun stranica.
+
+Postoje mnogi algoritmi pretraživanja teksta
+koji na jednostavan način ispunjavaju definirane zahtjeve.
+Iz perspektive računalne složenosti algoritama, jednostavno je implementirati pretraživanje
+teksta koje radi u linearnom vremenu. Nažalost, za nizove vrlo velike duljine linearno vrijeme
+znači praktično predugo trajanje pretraživanja. Otud potreba, pogotovo u području bioinformatike,
+za vremenski sub-linearnim algoritmima pretraživanja.
+
+U ovom projektu razmatramo implementaciju pretraživanja teksta koja se bazira na konceptu
+FM-indexa. Konkretna implementacija bazira se na binarnim stablima valića \engl{wavelet-trees}.
+Teoretsko razmatranje i praktično testiranje pokazuju da ovakva implementacija pretraživanja
+ima vremenski sub-linearnu složenost.
+
+\chapter{FM-index algoritam}
+
+\chapter{Implementacija i testiranje}
+
+\chapter{Zaključak}
+Zaključak.
+
+\bibliography{literatura}
+\bibliographystyle{unsrt}
+
+\chapter{Sažetak}
+Sažetak.
+
+\end{document}
