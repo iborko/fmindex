@@ -55,7 +55,7 @@
   title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
 }
 
-\title{Implementacija FM-index algoritma}
+\title{Implementacija FM-indeks algoritma}
 
 \author{Ivan Borko, Sofia Čolaković, Florijan Stamenković}
 
@@ -77,7 +77,7 @@ Tipično se rezultat pretraživanja $R$
 formulira kao niz indeksa (rednog broja znaka) unutar niza $S$ na kojem počinje pojavljivanje
 niza $Q$. Primjerice, za niz $S =$ \textit{"Žuti pas je opasan kad je opasan remenom oko pasa"}
 i niz $Q =$ \textit{"pas"} rezultati
-pretraživanja bili bi $R = \{6, 14, 28, 46\}$.
+pretraživanja su $R = \{6, 14, 28, 46\}$.
 
 U području bioinformatike pretraživanje teksta koristi se u za pronalazak
 specifičnih sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
@@ -88,16 +88,60 @@ A4 stranice fontom veličine 10pt rezultiralo s otprilike milijun stranica.
 Postoje mnogi algoritmi pretraživanja teksta
 koji na jednostavan način ispunjavaju definirane zahtjeve.
 Iz perspektive računalne složenosti algoritama, jednostavno je implementirati pretraživanje
-teksta koje radi u linearnom vremenu. Nažalost, za nizove vrlo velike duljine linearno vrijeme
+teksta koje radi u linearnom vremenu\footnote{Ako nije drukčije navedeno pri razmatranju složenosti pretraživanja
+uvijek govorimo o složenosti s obzirom na duljinu pretraživanog niza $S$.}.
+Nažalost, za nizove vrlo velike duljine linearno vrijeme
 znači praktično predugo trajanje pretraživanja. Otud potreba, pogotovo u području bioinformatike,
 za vremenski sub-linearnim algoritmima pretraživanja.
 
 U ovom projektu razmatramo implementaciju pretraživanja teksta koja se bazira na konceptu
-FM-indexa. Konkretna implementacija bazira se na binarnim stablima valića \engl{wavelet-trees}.
+FM-indeksa. Konkretna implementacija bazira se na binarnim stablima valića \engl{wavelet-trees}.
 Teoretsko razmatranje i praktično testiranje pokazuju da ovakva implementacija pretraživanja
 ima vremenski sub-linearnu složenost.
 
-\chapter{FM-index algoritam}
+\chapter{FM-indeks algoritam}
+
+"Indeksiranje" teksta označava generiranje struktura podataka koje su podrška efikasnom
+pretraživanju. Za velike tekstove poželjno je da indeks bude memorijski efikasan.
+FM-indeks \cite{Ferragina00opportunisticdata} pristup je indeksiranju koji ispunjava
+zahtjeve memorijske efikasnosti i sub-linearnog vremena pretraživanja. Prije nego definiramo
+FM-indeks, potrebno je razmotriti podatkovne strukture i algoritme koji ga sačinjavaju.
+
+\section{Burrows-Wheeler transformacija (BWT)}
+
+Burrows-Wheeler transformacija \cite{btw_1994} transformira niz znakova na način koji
+će omogućiti efikasnu pohranu i brzo ptreživanje. BWT transformirani niz originalnog
+teksta $T$ označavati ćemo sa $T^{BTW}$. Transformacija se provodi sljedećim koracima:
+
+\begin{enumerate}
+  \item{Poseban znak $\$$ koji je leksikografski manji od svih ostalih znakova se dodaje na kraj niza $T$}
+  \item{Cikličkim rotacijama niza $T$ dobiva sa se skup nizova koji čini tablicu $CR$ \engl{cyclic rotation}}
+  \item{Tablica $CR$ se leksikografski sortira u tablicu $SRC$}
+  \item{Posljednji stupac tablice $SCR$ se ektrahira u rezultat $T^{BTW}$}
+\end{enumerate}
+
+Opisani postupak ilustriran je za niz \textit{T = "AGATTAT"} na slici \ref{fig:bwt}, preuzetoj iz rada
+\cite{singer_2012}.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics{fig/bwt.pdf}
+\caption{Primjer algoritma BWT transormacije niza \textit{T = AGATTAT}}
+\label{fig:bwt}
+\end{figure}
+
+Bitno je primjetiti kako je BWT transformacija niza srodna sufiksnoj listi $SA$ \engl{suffix array}. Sufiksna lista
+je struktura podataka koja se često koristi u algoritmima nad tekstom. Njenu formulaciju
+nećemo detaljno objašnjavati, materijali na temu su široko dostupni. Sličnost između BWT
+transformacije i $SCR$ tablice korištene u BWT transformaciji ilustrirana je slikom \ref{fig:bwt_sa}.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics{fig/bwt_sa.pdf}
+\caption{SCR tablica BWT tranfsformacije i sufiksna lista za niz \textit{T = AGATTAT}}
+\label{fig:bwt_sa}
+\end{figure}
+
 
 \chapter{Implementacija i testiranje}
 
