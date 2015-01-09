@@ -72,12 +72,12 @@
 
 Pretraživanje teksta česta je praktična potreba mnogih informacijskih sustava.
 Pod terminom "pretraživanje teksta" podrazumijevamo pronalazak svih pojavljivanja
-nekog niza znakova $Q$ \engl{query} unutar drugog niza znakova $S$ \engl{string}.
-Tipično se rezultat pretraživanja $R$
-formulira kao niz indeksa (rednog broja znaka) unutar niza $S$ na kojem počinje pojavljivanje
-niza $Q$. Primjerice, za niz $S =$ \textit{"Žuti pas je opasan kad je opasan remenom oko pasa"}
-i niz $Q =$ \textit{"pas"} rezultati
-pretraživanja su $R = \{6, 14, 28, 46\}$.
+nekog niza znakova \textit{Q} \engl{query} unutar drugog niza znakova \textit{S} \engl{string}.
+Tipično se rezultat pretraživanja \textit{R}
+formulira kao niz indeksa (rednog broja znaka) unutar niza \textit{S} na kojem počinje pojavljivanje
+niza \textit{Q}. Primjerice, za niz \textit{S = "Žuti pas je opasan kad je opasan remenom oko pasa"}
+i niz \textit{Q = "pas"} rezultati
+pretraživanja su \textit{R = \{6, 14, 28, 46\}}.
 
 U području bioinformatike pretraživanje teksta koristi se u za pronalazak
 specifičnih sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
@@ -89,7 +89,7 @@ Postoje mnogi algoritmi pretraživanja teksta
 koji na jednostavan način ispunjavaju definirane zahtjeve.
 Iz perspektive računalne složenosti algoritama, jednostavno je implementirati pretraživanje
 teksta koje radi u linearnom vremenu\footnote{Ako nije drukčije navedeno pri razmatranju složenosti pretraživanja
-uvijek govorimo o složenosti s obzirom na duljinu pretraživanog niza $S$.}.
+uvijek govorimo o složenosti s obzirom na duljinu pretraživanog niza \textit{S}.}.
 Nažalost, za nizove vrlo velike duljine linearno vrijeme
 znači praktično predugo trajanje pretraživanja. Otud potreba, pogotovo u području bioinformatike,
 za vremenski sub-linearnim algoritmima pretraživanja.
@@ -111,13 +111,13 @@ FM-indeks, potrebno je razmotriti podatkovne strukture i algoritme koji ga sači
 
 Burrows-Wheeler transformacija \cite{btw_1994} transformira niz znakova na način koji
 će omogućiti efikasnu pohranu i brzo ptreživanje. BWT transformirani niz originalnog
-teksta $T$ označavati ćemo sa $T^{BTW}$. Transformacija se provodi sljedećim koracima:
+teksta \textit{T} označavati ćemo sa \textit{T\textsuperscript{BTW}}. Transformacija se provodi sljedećim koracima:
 
 \begin{enumerate}
-  \item{Poseban znak $\$$ koji je leksikografski manji od svih ostalih znakova se dodaje na kraj niza $T$}
-  \item{Cikličkim rotacijama niza $T$ dobiva sa se skup nizova koji čini tablicu $CR$ \engl{cyclic rotation}}
-  \item{Tablica $CR$ se leksikografski sortira u tablicu $SRC$}
-  \item{Posljednji stupac tablice $SCR$ se ektrahira u rezultat $T^{BTW}$}
+  \item{Poseban znak '\$' koji je leksikografski manji od svih ostalih znakova se dodaje na kraj niza \textit{T}}
+  \item{Cikličkim rotacijama niza \textit{T} dobiva sa se skup nizova koji čini tablicu \textit{CR} \engl{cyclic rotation}}
+  \item{Tablica \textit{CR} se leksikografski sortira u tablicu \textit{SCR}}
+  \item{Posljednji stupac tablice \textit{SCR} se ektrahira u rezultat \textit{T\textsuperscript{BTW}}}
 \end{enumerate}
 
 Opisani postupak ilustriran je za niz \textit{T = "AGATTAT"} na slici \ref{fig:bwt}, preuzetoj iz rada
@@ -130,16 +130,75 @@ Opisani postupak ilustriran je za niz \textit{T = "AGATTAT"} na slici \ref{fig:b
 \label{fig:bwt}
 \end{figure}
 
-Bitno je primjetiti kako je BWT transformacija niza srodna sufiksnoj listi $SA$ \engl{suffix array}. Sufiksna lista
+Bitno je primjetiti kako je BWT transformacija niza srodna sufiksnoj listi \textit{SA} \engl{suffix array}. Sufiksna lista
 je struktura podataka koja se često koristi u algoritmima nad tekstom. Njenu formulaciju
 nećemo detaljno objašnjavati, materijali na temu su široko dostupni. Sličnost između BWT
-transformacije i $SCR$ tablice korištene u BWT transformaciji ilustrirana je slikom \ref{fig:bwt_sa}.
+transformacije i \textit{SCR} tablice korištene u BWT transformaciji ilustrirana je slikom \ref{fig:bwt_sa}.
 
 \begin{figure}[!htb]
 \centering
 \includegraphics{fig/bwt_sa.pdf}
 \caption{SCR tablica BWT tranfsformacije i sufiksna lista za niz \textit{T = AGATTAT}}
 \label{fig:bwt_sa}
+\end{figure}
+
+\subsection{LF-mapiranje}
+
+LF-mapiranje \engl{last-to-first mapping} opisuje relaciju između posljednjeg
+stupca \textit{SCR} tablice (označenog \textit{L}) i prvog stupca te iste tablice (označenog
+\textit{F})\footnote{Primjetimo da je \textit{L} isti stupac
+koji definira BWT transformaciju.}. LF-mapiranje postulira da
+\textit{i}-to pojavljivanje znaka \textit{c} unutar stupca \textit{L} korespondira
+\textit{i}-tom pojavljivanju tog istog znaka unutar stupca \textit{F}. Pri tome "korespondira"
+znači da se radi o istom znaku unutar originalnog niza \textit{T}. Jednostavan dokaz ovog
+iskaza moguće je naći u \cite{singer_2012}.
+
+Brza implementacija LF-mapiranja (konstantne
+vremenske složenosti) može se ostvariti implementacijom dviju pomoćnih tablica. Tablica
+prefiksnih suma \textit{C} \engl{prefix-sum table} niza \textit{T} za svaki znak \textit{c}
+pohranjuje broj znakova u \textit{T} koji su manji od \textit{c}. Tablica pojavljivanja
+\textit{Occ} \engl{occurrence table} pohranjuje informaciju koliko puta se neki znak
+\textit{c} pojavio u nizu \textit{T} do pozicije \textit{i} (isključujući znak točno na
+poziciji \textit{i}). Korištenjem tablica \textit{C} i \textit{Occ} LF mapiranje za
+\textit{T\textsuperscript{BWT}} (koji odgovara stupcu \textit{L}) računa se na sljedeći način,
+za znak \textit{c} na poziciji \textit{i}:
+
+\begin{enumerate}
+  \item{Pronađi broj pojavljivanja \textit{c} u \textit{T\textsuperscript{BWT}} do pozicije \textit{i} unutar tablice \textit{Occ}}
+  \item{Pronađi broj znakova manjih od \textit{c} u \textit{T\textsuperscript{BWT}} unutar tablice \textit{C}}
+  \item{Zbroj pronađenih vrijednosti je indeks korespondirajućeg znaka u stupcu \textit{L}}
+\end{enumerate}
+
+\subsection{Rekonstrukcija originala}
+
+Na temelju transformiranog niza \textit{T\textsuperscript{BWT}} moguće je rekonstruirati
+originalni niz \textit{T} korištenjem LF-transformacije. Postupak je jednostavan, ako imamo
+na umu definiciju LF-transformacije i činjenicu da je prvi znak u \textit{T\textsuperscript{BWT}}
+zasigurno posljednji znak niza \textit{T} (ovo proizlazi iz činjenice da smo pri postupku BWT
+transormacije na početak niza umetnuli znak '\$').
+
+Rekonstrukcija niza \textit{T} obavlja se unatrag, od posljednjeg znaka prema prvom. Postupak
+je sljedeći:
+
+\begin{enumerate}
+  \item{Prvi znak iz \textit{T\textsuperscript{BWT}} je posljednji znak iz \textit{T}, zabilježimo ga}
+  \item{LF-transformacijom pronađimo \textit{F}-indeks  posljednjeg zabilježenog znaka \footnote{
+    U ovom trenutku nemamo tablicu \textit{SCR}, zanima nas samo indeks}}
+  \item{Dobiveni \textit{F}-indeks u \textit{T\textsuperscript{BWT}} nizu ukazuje na znak koji u nizu
+    \textit{T} prethodi posljednjem zabilježenom znaku (posljedica rotacije pri konstrukciji \textit{SCR})}
+  \item{Zabilježimo znak na \textit{F}-indeks poziciji niza \textit{T\textsuperscript{BWT}} u rekonstrukciju}
+  \item{Ako posljednji zabilježeni znak nije '\$', vraćamo se na korak 2.}
+\end{enumerate}
+
+Opisani postupak vizualiziran je na slici \ref{fig:lf_reconstruct}. Bitno je primjetiti kako pri
+rekonstrukciji originala nismo koristili ništa osim transformiranog niza \textit{T\textsuperscript{BWT}}
+i LF-mapiranja (koje se ostvaruje tablicama \textit{C} i \textit{Occ}).
+
+\begin{figure}[!htb]
+\centering
+\includegraphics{fig/lf_reconstruct.pdf}
+\caption{Primjer rekonstrukcije originala iz transformiranog niza \textit{T\textsuperscript{BWT}}}
+\label{fig:lf_reconstruct}
 \end{figure}
 
 
