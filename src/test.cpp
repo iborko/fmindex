@@ -1,9 +1,4 @@
-#include <iostream>
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-// TODO
-int main() {
-    std::cout << "Running tests" << std::endl;
-    std::cout << "Done" << std::endl;
-
-    return 0;
-}
+// include all test files
+#include "../include/test/TestPrefixSumTable.h"
