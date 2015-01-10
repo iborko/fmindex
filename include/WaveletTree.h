@@ -49,7 +49,7 @@ private:
     // construct a binary WaveletTree
     // recursive
     // method deletes object str points to
-    Node* create_node(std::string* str, const std::string& alph,
+    Node* create_node(const std::string* str, const std::string& alph,
         const CharIntMap& counts);
 };
 
