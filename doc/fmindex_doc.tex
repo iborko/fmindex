@@ -201,6 +201,98 @@ i LF-mapiranja (koje se ostvaruje tablicama \textit{C} i \textit{Occ}).
 \label{fig:lf_reconstruct}
 \end{figure}
 
+\subsection{Pretraživanje}
+\label{sec:pretrazivanje}
+
+Transformirani niz \textit{T\textsuperscript{BWT}} može se koristiti i za pretraživanje
+originalnog teksta \textit{T}. Algoritam pretraživanja vrlo je sličan rekonstrukciji
+originala. Bazira se zapravo na poznatom načinu pretraživanja sufiksnih polja, kao
+što je već spomenuto, BWT transformacija i sufiksno polje nekog niza su skoro ekvivalentni.
+
+Algoritam pretraživanja pojavljivanja niza \textit{Q} unutar niza \textit{T} na temelju
+BWT transforacije \textit{T\textsuperscript{BWT}} bazira se na sljedećim konceptima:
+
+\begin{itemize}
+  \item{Pretraživanje se vrši po znakovima \textit{Q} unatrag (od zadnjeg prema prvom)}
+  \item{Prate se početni i krajnji indeks sufiksa (\textit{SCR} tablice) unutar kojih su moguće podudarnosti}
+  \item{U svakom koraju (procesiranom znaku iz \textit{P}) se područje mogućih podudarnosti smanjuje}
+\end{itemize}
+
+Ako početni indeks označimo \textit{ps} \engl{pointer start}, a krajnji indeks \textit{pe}
+\engl{pointer end}, tada se algoritam izvršava sljedećim koracima:
+
+\begin{enumerate}
+  \item{Inicijaliziraj indekse \textit{ps} i \textit{pe} tako da obuhvaćaju cijelu tablicu \textit{SCR}}
+  \item{Odaberi prvi neobrađeni znak \textit{c} iz niza \textit{Q}, počevši od kraja}
+  \item{Unutar područja među indeksima nađi prvo i posljednje pojavljivanje znaka \textit{c}
+    \footnote{Učinkovita implementacija pretraživanja ne izvršava ovaj korak, navodimo ga
+    samo radi opisa rada algoritma.}}
+  \item{Izračunaj \textit{L}-indekse nađenih pojavljivanja koristeći LF-mapiranje}
+  \item{Ako postoje neobrađeni znakovi u \textit{Q}, vrati se na korak 2.}
+\end{enumerate}
+
+Navedeni koraci algoritma formulirani su kako bi bili što jasniji. Opis prikladniji
+za izravnu računalnu implementaciju može se naći u radu \cite{singer_2012}. Slika
+\ref{fig:sa_search} prikazuje korake pretraživanja za \textit{Q = TAT}.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics{fig/sa_search.pdf}
+\caption{Primjer pretraživanja teksta korištenjem transformiranog niza \textit{T\textsuperscript{BWT}}}
+\label{fig:sa_search}
+\end{figure}
+
+\section{Analiza složenosti algoritma}
+
+Glavni razlog za razvoj FM-indeksa je povećanje efikasnosti pretraživanja dugih nizova
+(poput genotipa). U ovom poglavlju će se razmotriti složenost pretraživanja korištenjem
+FM-indeksa, sa teoretskog stanovišta. Pri tome nas zanima složenost korištenja
+izgrađenog indeksa za neki niz, a ne složenost stvaranja indeksa.
+
+\subsection{Vremenska složenost}
+
+Razmotrimo vrijeme pronalaska pojavljivanja niza \textit{Q} unutar niza \textit{T}, na
+način opisan u poglavlju \ref{sec:pretrazivanje}. Iz algoritma je vidljivo da je
+potreban jedan korak za svaki znak u \textit{Q}, dakle pretraživanje ima linearnu
+složenost s obzirom na duljinu \textit{Q}. Svaki od tih koraka svodi se na dvije
+operacije LF-mapiranja, koje ima konstantnu vremensku složenost (ne ovisi o duljinama
+nizova \textit{T} i \textit{Q}).
+
+Važna napomena je da prolazak kroz znakove niza \textit{Q} može biti prekinut u slučaju
+da se utvrdi da nema pojavljivanja \textit{Q} unutar \textit{T}, što se može desiti
+u bilo kojem trenutku prolaska kroz \textit{Q}.
+
+Dakle, vremenska složenost pretraživanja je generalno linearna s obzirom na duljinu
+niza \textit{Q}.
+
+\subsection{Memorijska složenost}
+
+Memorijska (prostorna složenost) je razmatranje utroška memorije na potporne
+strukture podataka FM-indeksa. Podatci koji se koriste su transformirani niz
+\textit{T\textsuperscript{BWT}} (odnosno sufiksno polje) te tablice \textit{C}
+i \textit{Occ} korištene za LF-mapiranje.
+
+Sufiksno polje ima jednak broj elemenata kao i originalni niz \textit{T}. U
+tom smislu je memorijska složenost polja linearna s obzirom na duljinu \textit{T}.
+Isto vrijedi i za transformirani niz \textit{T\textsuperscript{BWT}}. Prostorni
+utrošak sufiksnog polja može se smanjiti na više načina, a niz \textit{T\textsuperscript{BWT}}
+je često oblika pogodnog za komprimiranje, ali obje tehnike izlaze izvan okvira
+ovog rada.
+
+Tablica prefiksnih suma \textit{C} pohranjuje po jedan cijeli broj za svaki
+element abecede niza \textit{T}. Iako je u teoriji taj broj ograničen samo
+duljinom niza \textit{T}, u praksi je zapravo vrlo malen te tablica \textit{C}
+ne predstavlja problem u kontekstu zauzeća memorije.
+
+Tablica pojavljivanja \textit{Occ} (u naivnoj implementaciji) pohranjuje po
+jedan cijeli broj za svaku poziciju niza \textit{T}, za svaki element abecede \textit{T}.
+Primjećujemo linearnu složenost s obzirom na duljinu niza \textit{T}. S obzirom
+na potencijalno ogromne duljine nizova koje želimo moći pretraživati, ovo je problem.
+Postoji više pristupa "kodiranja" tablice \textit{Occ}. Unutar ovog rada, zadatak
+je implementirati FM-indeks korištenjem stabla valića.
+
+
+\chapter{Stablo valića}
 
 \chapter{Implementacija i testiranje}
 
