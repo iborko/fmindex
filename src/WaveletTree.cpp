@@ -13,16 +13,17 @@ WaveletTree::WaveletTree(const std::string& s, UInt bucket_size)
 
     // get char counts in the string s
     CharIntMap counts;
+    // initialize count of every char from alphabet to zero
     std::string::const_iterator string_it = alph.begin();
     for (; string_it != alph.end(); string_it++)
         counts[*string_it] = 0;
 
+    // count chars
     string_it = s.begin();
     for (; string_it != s.end(); string_it++)
         counts[*string_it] += 1;
 
-    std::string* temp = new std::string(s);
-    this->root_ = this->create_node(temp, alph, counts);
+    this->root_ = this->create_node(&s, alph, counts);
 }
 
 WaveletTree::~WaveletTree() {
@@ -66,16 +67,15 @@ char WaveletTree::calc_pivot(const std::string& alph, const CharIntMap& counts) 
     return alph[alph.size() - 1];
 }
 
-WaveletTree::Node* WaveletTree::create_node(std::string* str,
+WaveletTree::Node* WaveletTree::create_node(const std::string *str,
     const std::string& alph, const CharIntMap& counts) {
     
     if (alph.size() < 2) {
-        delete str;
         return NULL;
     }
 
     std::size_t str_len = str->size();
-    /*
+    /* // tree building info
     std::cout << "--- Creating new node" << std::endl;
     std::cout << "-string is: " << *str << std::endl;
     std::cout << "-str_len is: " << str_len << std::endl;
@@ -88,11 +88,11 @@ WaveletTree::Node* WaveletTree::create_node(std::string* str,
 
     // create the bitstring
     BitVector bit_string;
-    bit_string.resize(str->size());
+    bit_string.resize(str_len);
     for (std::size_t i = 0; i < str_len; i++)
-        bit_string[i] = str->at(i) > pivot;
+        bit_string[i] = str->at(i) >= pivot;
 
-    /*
+    /* // tree building info
     std::cout << "BitString" << std::endl;
     for (std::size_t i = 0; i < bit_string.size(); i++)
         std::cout << bit_string[i] << " ";
@@ -103,12 +103,12 @@ WaveletTree::Node* WaveletTree::create_node(std::string* str,
     node->pivot = pivot;
 
     // fill with spaces, create string with proper size
-    std::string* left_string = new std::string(node->bit_string.rank(str_len-1),
-        ' ');
-    std::string* right_string = new std::string(str_len - left_string->size(),
-        ' ');
+    UInt right_length = node->bit_string.rank(str_len);
+    UInt left_length = str_len - right_length;
+    std::string* left_string = new std::string(left_length, ' ');
+    std::string* right_string = new std::string(right_length, ' ');
 
-    // populate strins for each node with appropriate values
+    // populate strings for each node with appropriate values
     UInt left_index = 0;
     UInt right_index = 0;
     for (std::size_t i = 0; i < str_len; i++) {
@@ -121,9 +121,8 @@ WaveletTree::Node* WaveletTree::create_node(std::string* str,
             left_index++;
         }
     }
-    //std::cout << "L: " << *left_string << ", R: " << *right_string << std::endl;
-
-    delete str;
+    //std::cout << "L: " << *left_string << ", R: " << *right_string << "//"
+    //    << std::endl;
 
     std::size_t pivot_index = alph.find(pivot);
     std::string left_alph = alph.substr(0, pivot_index);
@@ -131,6 +130,9 @@ WaveletTree::Node* WaveletTree::create_node(std::string* str,
 
     node->left_node = this->create_node(left_string, left_alph, counts);
     node->right_node = this->create_node(right_string, right_alph, counts);
+    
+    delete left_string;
+    delete right_string;
 
     return node;
 }

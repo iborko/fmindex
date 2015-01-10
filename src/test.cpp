@@ -2,3 +2,6 @@
 
 // include all test files
 #include "../include/test/TestPrefixSumTable.h"
+#include "../include/test/TestOccurenceTable.h"
+#include "../include/test/TestBitStringRank.h"
+#include "../include/test/TestWaveletTree.h"
