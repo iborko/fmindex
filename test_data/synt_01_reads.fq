@@ -1,0 +1,32 @@
+@Syntetic sequence 01, read 01 location_2_
+TAG
++
+111
+@Syntetic sequence 01, read 02 location_5_
+CTG
++
+111
+@Syntetic sequence 01, read 03 location_0_
+ATT
++
+111
+@Syntetic sequence 01, read 05 location_6_
+TGAC
++
+1111
+@Syntetic sequence 01, read 06 location_7_
+GAC
++
+111
+@Syntetic sequence 01, read 07 location_6_
+TGA
++
+111
+@Syntetic sequence 01, read 08 location_5_
+CTGA
++
+111
+@Syntetic sequence 01, read 09 location_0_
+AT
++
+11

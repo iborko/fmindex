@@ -1,10 +1,10 @@
 #ifndef BWTRANSFORM_H_
 #define BWTRANSFORM_H_
 
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "StringRotator.h"
 #include "functors.h"
@@ -14,20 +14,11 @@
 class BWTransform {
 public:
     static std::string transform(const std::string& );
-    /* static int lf_mapping(
-        const OccurrenceTableInterface& occ_table,
-        const PrefixSumTableInterface& ps_table,
-        char c); */
+
     static std::string reverse(
         const std::string& bwt_text,
         const OccurrenceTableInterface& occ_table,
         const PrefixSumTableInterface& ps_table);
-    static std::vector<int> search(
-            const std::string& pattern,
-            const std::vector<int>& alph,
-            const int * sa,
-            const OccurrenceTableInterface& occ_table,
-            const PrefixSumTableInterface& ps_table);
 };
 
 #endif
