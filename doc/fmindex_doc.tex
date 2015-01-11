@@ -80,24 +80,25 @@ i niz \textit{Q = "pas"} rezultati
 pretraživanja su \textit{R = \{6, 14, 28, 46\}}.
 
 U području bioinformatike pretraživanje teksta koristi se u za pronalazak
-specifičnih sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
+sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
 bioinformatičkog pretraživanja jest da su nizovi koji se pretražuju iznimno velike duljine.
 Primjerice, ljudski genom tipično sadrži oko $3.3 \times 10^9$ znakova, što bi otisnuto na
 A4 stranice fontom veličine 10pt rezultiralo s otprilike milijun stranica.
 
 Postoje mnogi algoritmi pretraživanja teksta
 koji na jednostavan način ispunjavaju definirane zahtjeve.
-Iz perspektive računalne složenosti algoritama, jednostavno je implementirati pretraživanje
+Iz perspektive računalne složenosti algoritama, nije teško implementirati pretraživanje
 teksta koje radi u linearnom vremenu\footnote{Ako nije drukčije navedeno pri razmatranju složenosti pretraživanja
 uvijek govorimo o složenosti s obzirom na duljinu pretraživanog niza \textit{S}.}.
 Nažalost, za nizove vrlo velike duljine linearno vrijeme
 znači praktično predugo trajanje pretraživanja. Otud potreba, pogotovo u području bioinformatike,
-za vremenski sub-linearnim algoritmima pretraživanja.
+za vremenski sub-linearnim algoritmima pretraživanja. Istovremeno, potrebno je memorijske
+zahtjeve algoritma pretraživanja zadžati što manjima.
 
 U ovom projektu razmatramo implementaciju pretraživanja teksta koja se bazira na konceptu
 FM-indeksa. Konkretna implementacija bazira se na binarnim stablima valića \engl{wavelet-trees}.
 Teoretsko razmatranje i praktično testiranje pokazuju da ovakva implementacija pretraživanja
-ima vremenski sub-linearnu složenost.
+ima vremenski sub-linearnu složenost, uz prihvatljivu memorijsku složenost.
 
 \chapter{FM-indeks algoritam}
 
@@ -117,7 +118,7 @@ teksta \textit{T} označavati ćemo sa \textit{T\textsuperscript{BTW}}. Transfor
   \item{Poseban znak '\$' koji je leksikografski manji od svih ostalih znakova se dodaje na kraj niza \textit{T}}
   \item{Cikličkim rotacijama niza \textit{T} dobiva sa se skup nizova koji čini tablicu \textit{CR} \engl{cyclic rotation}}
   \item{Tablica \textit{CR} se leksikografski sortira u tablicu \textit{SCR}}
-  \item{Posljednji stupac tablice \textit{SCR} se ektrahira u rezultat \textit{T\textsuperscript{BTW}}}
+  \item{Posljednji stupac tablice \textit{SCR} (čitan odozgo prema dolje) čini rezultat \textit{T\textsuperscript{BTW}}}
 \end{enumerate}
 
 Opisani postupak ilustriran je za niz \textit{T = "AGATTAT"} na slici \ref{fig:bwt}, preuzetoj iz rada
@@ -154,12 +155,12 @@ znači da se radi o istom znaku unutar originalnog niza \textit{T}. Jednostavan 
 iskaza moguće je naći u \cite{singer_2012}.
 
 Brza implementacija LF-mapiranja (konstantne
-vremenske složenosti) može se ostvariti implementacijom dviju pomoćnih tablica. Tablica
+vremenske složenosti) može se ostvariti korištenjem dviju pomoćnih tablica. Tablica
 prefiksnih suma \textit{C} \engl{prefix-sum table} niza \textit{T} za svaki znak \textit{c}
 pohranjuje broj znakova u \textit{T} koji su manji od \textit{c}. Tablica pojavljivanja
 \textit{Occ} \engl{occurrence table} pohranjuje informaciju koliko puta se neki znak
 \textit{c} pojavio u nizu \textit{T} do pozicije \textit{i} (isključujući znak točno na
-poziciji \textit{i}). Korištenjem tablica \textit{C} i \textit{Occ} LF mapiranje za
+poziciji \textit{i}). Korištenjem tablica \textit{C} i \textit{Occ} LF-mapiranje za
 \textit{T\textsuperscript{BWT}} (koji odgovara stupcu \textit{L}) računa se na sljedeći način,
 za znak \textit{c} na poziciji \textit{i}:
 
@@ -183,7 +184,7 @@ je sljedeći:
 \begin{enumerate}
   \item{Prvi znak iz \textit{T\textsuperscript{BWT}} je posljednji znak iz \textit{T}, zabilježimo ga}
   \item{LF-transformacijom pronađimo \textit{F}-indeks  posljednjeg zabilježenog znaka \footnote{
-    U ovom trenutku nemamo tablicu \textit{SCR}, zanima nas samo indeks}}
+    U ovom trenutku nemamo tablicu \textit{SCR} niti stupac \textit{F}, zanima nas samo indeks.}}
   \item{Dobiveni \textit{F}-indeks u \textit{T\textsuperscript{BWT}} nizu ukazuje na znak koji u nizu
     \textit{T} prethodi posljednjem zabilježenom znaku (posljedica rotacije pri konstrukciji \textit{SCR})}
   \item{Zabilježimo znak na \textit{F}-indeks poziciji niza \textit{T\textsuperscript{BWT}} u rekonstrukciju}
@@ -206,7 +207,7 @@ i LF-mapiranja (koje se ostvaruje tablicama \textit{C} i \textit{Occ}).
 
 Transformirani niz \textit{T\textsuperscript{BWT}} može se koristiti i za pretraživanje
 originalnog teksta \textit{T}. Algoritam pretraživanja vrlo je sličan rekonstrukciji
-originala. Bazira se zapravo na poznatom načinu pretraživanja sufiksnih polja, kao
+originala. Bazira se zapravo na poznatom načinu pretraživanja sufiksnih polja. Kao
 što je već spomenuto, BWT transformacija i sufiksno polje nekog niza su skoro ekvivalentni.
 
 Algoritam pretraživanja pojavljivanja niza \textit{Q} unutar niza \textit{T} na temelju
@@ -228,6 +229,7 @@ Ako početni indeks označimo \textit{ps} \engl{pointer start}, a krajnji indeks
     \footnote{Učinkovita implementacija pretraživanja ne izvršava ovaj korak, navodimo ga
     samo radi opisa rada algoritma.}}
   \item{Izračunaj \textit{L}-indekse nađenih pojavljivanja koristeći LF-mapiranje}
+  \item{Dobivni \textit{L}-indeksi su nove vrijednost indeksa \textit{ps} i \textit{pe}}
   \item{Ako postoje neobrađeni znakovi u \textit{Q}, vrati se na korak 2.}
 \end{enumerate}
 
@@ -242,11 +244,11 @@ za izravnu računalnu implementaciju može se naći u radu \cite{singer_2012}. S
 \label{fig:sa_search}
 \end{figure}
 
-\section{Analiza složenosti algoritma}
+\section{Složenost pretraživanja}
 
 Glavni razlog za razvoj FM-indeksa je povećanje efikasnosti pretraživanja dugih nizova
-(poput genotipa). U ovom poglavlju će se razmotriti složenost pretraživanja korištenjem
-FM-indeksa, sa teoretskog stanovišta. Pri tome nas zanima složenost korištenja
+(poput genotipa). U ovom poglavlju će se razmotriti teoretska složenost pretraživanja korištenjem
+FM-indeksa. Pri tome nas zanima složenost korištenja
 izgrađenog indeksa za neki niz, a ne složenost stvaranja indeksa.
 
 \subsection{Vremenska složenost}
@@ -263,12 +265,14 @@ da se utvrdi da nema pojavljivanja \textit{Q} unutar \textit{T}, što se može d
 u bilo kojem trenutku prolaska kroz \textit{Q}.
 
 Dakle, vremenska složenost pretraživanja je generalno linearna s obzirom na duljinu
-niza \textit{Q}.
+niza \textit{Q}. Ovaj rezultat je pogodan za pretraživanje dugih nizova \textit{T},
+jer ne ovisi o njihovoj duljini.
 
 \subsection{Memorijska složenost}
 
-Memorijska (prostorna složenost) je razmatranje utroška memorije na potporne
-strukture podataka FM-indeksa. Podatci koji se koriste su transformirani niz
+Memorijska (prostorna) složenost označava utrošak memorije na potporne
+strukture podataka FM-indeksa, s obzirom na niz \textit{T}.
+Podatkovne strukture koje se koriste u pretraživanju su transformirani niz
 \textit{T\textsuperscript{BWT}} (odnosno sufiksno polje) te tablice \textit{C}
 i \textit{Occ} korištene za LF-mapiranje.
 
@@ -276,12 +280,13 @@ Sufiksno polje ima jednak broj elemenata kao i originalni niz \textit{T}. U
 tom smislu je memorijska složenost polja linearna s obzirom na duljinu \textit{T}.
 Isto vrijedi i za transformirani niz \textit{T\textsuperscript{BWT}}. Prostorni
 utrošak sufiksnog polja može se smanjiti na više načina, a niz \textit{T\textsuperscript{BWT}}
-je često oblika pogodnog za komprimiranje, ali obje tehnike izlaze izvan okvira
-ovog rada.
+je često oblika pogodnog za komprimiranje. Obje tehnike izlaze izvan okvira
+ovog rada, mi koristimo postojeće implementacije sufiksnog polja koje su memorijski
+optimizirane.
 
 Tablica prefiksnih suma \textit{C} pohranjuje po jedan cijeli broj za svaki
-element abecede niza \textit{T}. Iako je u teoriji taj broj ograničen samo
-duljinom niza \textit{T}, u praksi je zapravo vrlo malen te tablica \textit{C}
+element abecede niza \textit{T}. Iako je u teoriji broj znakova abecede ograničen samo
+duljinom niza \textit{T}, u praksi je najčešće vrlo malen te tablica \textit{C}
 ne predstavlja problem u kontekstu zauzeća memorije.
 
 Tablica pojavljivanja \textit{Occ} (u naivnoj implementaciji) pohranjuje po
@@ -293,6 +298,116 @@ je implementirati FM-indeks korištenjem stabla valića.
 
 
 \chapter{Stablo valića}
+
+Stablo valića \engl{wavelet tree}, definirano u \cite{Grossi:2003:HET:644108.644250},
+koristimo za efikasnu implementaciju 
+tablice pojavljivanja \textit{Occ}, koja se koristi za LF-mapiranje unutar
+FM-indeksa. \textit{Occ} tablica daje informaciju o broju
+pojavljivanja znaka \textit{c} unutar niza \textit{T} do pozicije \textit{i}
+(ne uključujući znak na poziciji \textit{i}). Ova operacija naziva se "rangiranje",
+možemo reći da tražimo \textit{rank} znaka \textit{c} u \textit{T} do pozicije \textit{i},
+odnosno \textit{rank(T, c, i)}.
+
+\section{Definicija stabla valića}
+
+Stablo valića kodira niz \textit{T} u binarno stablo. Svaki čvor stabla ima pripadajući
+znak (prijelomnu točku \textit{p}) i binarni niz (niz sačinjen od nula i jedinica). Nule u 
+binarnom nizu čvora označavaju znakove
+originalnog niza koji su manji od znaka prijelomne točke \textit{p}, a jedinice
+znakove koji su veći ili jednaki (pri tome se u čvoru ne pohranjuje originalni niz, već
+samo binarni). Znakovi originalnog niza označeni nulama sačinjavaju lijevo
+dijete čvora, a oni označeni jedinicama desno. Čvorovi se kreiraju samo ako sadrže dva ili više
+različita znaka (za niz proizvoljne duljine začinjen od samo jednog znaka se ne stvara stablo).
+ Primjer binarnog stabla za genotipski niz "AGCTAGCTCATACAGGGTATGACCAGTACGACAG"
+prikazan je na slici \ref{fig:wavelet_ex1}.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics{fig/wavelet_ex1.pdf}
+\caption{Primjer stabla valića za niz "AGCTAGCTCATACAGGGTATGACCAGTACGACAG". Znakovi
+  originalnog niza prikazani u čvorovima stabla služe samo za ilustraciju, konkretna implementacija
+  sadrži samo binarne nizove i znakove koji su prijelomne točke čvorova.}
+\label{fig:wavelet_ex1}
+\end{figure}
+
+\section{Rangiranje korištenjem stabla valića}
+
+"Rank" znaka \textit{c} unutar niza \textit{T} do pozicije \textit{i} je broj pojavljivanja
+tog istog znaka u prvih \textit{i} znakova niza \textit{T}. Operacija rangiranja može
+se efikasno ostvariti korištenjem stabla valića.
+
+Pretpostavimo da imamo
+vremenski konstantnu implementaciju binarnog rangiranja. Binarno rangiranje ima
+istu definiciju kao općenito rangiranje, ali se obavlja nad binarnim nizovima,
+dakle svodi se na prebrojavanje jedinica u binarnom nizu. Implementacija
+vremenski konstantne složenosti biti će objašnjena u nastavku. 
+
+Svaki čvor stabla ima pripadnu prijelomnu točku \textit{p} i binarni niz.
+Koristeći binarno rangiranje
+za svaki čvor stabla valića lako je utvrditi broj znakova manjih ili većih
+od \textit{p}, u prvih \textit{i} znakova čvora. Razmatramo dvije situacije:
+znak \textit{c} koji rangiramo može biti leksikografski manji od \textit{p}
+ili veći-ili-jednak. U prvoj situaciji broj nula binarnog ranga čvora po
+\textit{p} govori koliko znakova lijevog djeteta čvora trebamo pretražiti,
+u drugoj situaciji broj jedinica govori koliko znakova desnog djeteta trebamo
+pretražiti. Spuštajući se tako kroz stablo dolazi trenutak kada relevantno
+dijete trenutnog čvora ne postoji, tada je trenutni broj pretraživanja istovremeno
+i konačni rezultat. Opširnija objašnjenja rangiranja korištenjem stabla valića
+široko su dostupna\footnote{Primjerice na http://alexbowe.com/wavelet-trees/}.
+
+\section{Vremenska i memorijska složenost stabla valića}
+
+\subsection{Vremenski konstantno binarno rangiranje}
+
+Za ostvarivanje brzog rangiranja korištenjem stabla valića potrebna je sposobnost
+brzog rangiranja binarnog niza. Problem rangiranja binarnog niza jednostavniji
+je jer postoje samo dva znaka abecede. Pri tome je potrebno rangirati samo jedan
+znak (primjerice znak 1) jer se rang drugog znaka dobiva kao \textit{rank(T, 0, i)
+= i - rank(T, 1, i)}. Konstantna vremenska složenost ovakvog rangiranja ostvaruje
+se grupiranjem niza u "kante" duljine \textit{k}. Za svaku kantu se prati broj
+jedinica sadržanih u svim prethodnim kantama. Time se za svaki \textit{i} rangiranje
+obavlja određivanjem kante kojoj \textit{i} pripada, običnim prebrojavanjem jedinica
+do pozicije \textit{i} samo unutar
+te kante, te pribrajanjem broja jedinica sadržanih u prethodnim kantama. Time je
+prebrojavanje (iteracija po znakovima) ograničeno na veličinu kante, ne ovisi više
+o duljini originalnog niza. Ovakvo rangiranje stoga ima konstantnu vremensku složenost s obzirom
+na duljinu originalnog niza.
+
+Konkretna implementacija opisanog rangiranja je malo složenija jer se zbog
+memorijske učinkovitosti koriste kante i "super-kante", ali je konceptualno
+identična i vremenski jednako efikasna.
+
+\subsection{Vremenska složenost rangiranja stablem valića}
+
+Stablo valića može prestavljati proizvoljan niz, proizvoljne abecede. Pri tome
+se ono razlaže binarno po elementima abecede. Rangiranje se svodi na jedan
+dubinski prolaz kroz stablo. Dubina binarnog stabla je jednaka
+$log_2(|\Sigma|)$, gdje je $\Sigma$ skup znakova abacede,
+što istovremeno određuje vremensku složenost rangiranja. Pošto je
+binarno rangiranje u svakom čvoru konstantne složenosti, konačna složenost
+rangiranja je logaritamska s obzirom na veličinu abecede. Pošto su
+u većini primjena korištene abecede relativno male (u bioinformatici radi
+se o 4 ili 5 znakova), rangiranje korištenjem stabla valića ima iznimno
+dobre performanse.
+
+\subsection{Memorijska složenost stabla valića}
+
+Indeksiranje niza znakova u pravilu povećava memorijsku složenost kako
+bi se smanjila vremenska. Pri tome je poželjno da memorijsko povećanje
+nije preveliko, pogotovo kada se radi sa iznimno velikim nizovima.
+
+Stablo valića pohranjuje binarne varijante originalnog niza. Pri tome
+korijenski čvor pohranjuje binarni niz dulje jednake originalnom nizu.
+Djeca korijenskog čvora sadrže binarne nizove koji zajedno imaju duljinu
+jednaku originalnom nizu (može se isčitati iz definicije, ilustrirano
+na slici \ref{fig:wavelet_ex1}). Ista stvar se dešava sa daljnjim grananjem
+stabla. Stoga svaka razina stabla (čvorevi jednako udaljeni od korijenskog)
+sadrži binarne nizove čija ukupna duljina je jednaka originalnom nizu.
+Stablo ima  $log_2(|\Sigma|)$ razina, gdje je $\Sigma$ skup znakova abacede.
+Stoga je konačna memorijska složenost stabla $n * log_2(|\Sigma|)$ bitova, gdje
+je $n$ broj znakova originalnog niza.
+Sličnu složenost imaju neki algortmi kompresije, radi se dakle o
+relativno niskoj memorijskoj zahtjevnosti.
 
 \chapter{Implementacija i testiranje}
 
