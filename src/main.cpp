@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     std::vector<char> alphabet(alphabet_set.begin(), alphabet_set.end());
 
     PrefixSumTableInterface* prefixsum_table = new PrefixSumTable(fs->sequence());
-    int* suffix_array = SuffixArray::get_sa(fs->sequence(), fs->sequence().size());
+    IntVector suffix_array = SuffixArray::get_sa(fs->sequence(), fs->sequence().size());
 
     // read sequence reads (FASTQ file format)
     FastqReader reads_reader(argv[2]);
