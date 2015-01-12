@@ -7,7 +7,6 @@ BitStringRank::BitStringRank(const BitVector& bit_vector, UInt bucket_size)
     assert(bucket_size < (1 << (sizeof(BucketType) * 8)));
 
     this->_length = bit_vector.size();
-    //std::cout << "-- Creatin new BitStringRank" << std::endl;
     //std::cout << "Bit vector has size of " << _length << std::endl;
     
     // fill with zeros
@@ -57,7 +56,6 @@ BitStringRank::BitStringRank(const BitVector& bit_vector, UInt bucket_size)
 }
 
 UInt BitStringRank::rank(UInt i) {
-    //std::cout << "BitStringRank rank " << i << ", length " << this->_length << std::endl;
     assert(i <= this->_length);
 
     if (i == 0) return 0;

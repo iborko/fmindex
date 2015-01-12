@@ -11,7 +11,7 @@ SOURCES_CPP := $(shell find $(SRCDIR) -type f -name [[:upper:]]*.cpp)
 SOURCES_C := $(shell find $(SRCDIR) -type f -name *.c)
 OBJECTS_CPP := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES_CPP:.cpp=_cpp.o))
 OBJECTS_C := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES_C:.c=_c.o))
-CFLAGS := -g # -Wall
+CFLAGS := -O2 # -g -pg -Wall
 LIB := -pthread
 INC := -I include
 

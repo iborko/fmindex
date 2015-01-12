@@ -17,9 +17,15 @@ typedef std::map<char, UInt> CharIntMap;
 typedef std::vector<UInt> UIntVector;
 
 
+// A binary wavelet tree. It's purpose is to allow fast (log(|alphabeth|))
+// ranking. Ranking is determening the number of occurrences of a character
+// in a (sub)string.
 class WaveletTree : public OccurrenceTableInterface {
 public:
+    // constructor
     // s - the string that tree should represent
+    // buckets contain sumarized values of every bucket_size values
+    // superbucket size will be set to (bucket_size)^2
     WaveletTree(const std::string& s, UInt bucket_size);
     virtual ~WaveletTree();
 

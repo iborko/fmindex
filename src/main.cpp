@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "../include/OccurrenceTable.h"
 #include "../include/WaveletTree.h"
@@ -14,7 +15,7 @@ int main(int argc, char *argv[]) {
 
     if (argc < 3) {
         std::cerr <<
-            "Wrong number of arguments\n"
+            "Missing arguments\n"
             "Usage:\n"
             "    fmindex <sequence.fa> <reads.fq> "
             "[<occurence_implementation> [<bucket_size>]]\n"
@@ -31,11 +32,24 @@ int main(int argc, char *argv[]) {
         std::cerr << "Cant read sequence from " << argv[1] << std::endl;
         exit(EXIT_FAILURE);
     }
+    fs->sequence().push_back('$');
+    
+    size_t sequence_size = fs->sequence().size();
+    IntVector suffix_array = SuffixArray::get_sa(fs->sequence());
 
-    std::string bw_transformed = BWTransform::transform(fs->sequence());
+    // slower bw transformation (rotation-of-string based)
+    //std::string bw_transformed = BWTransform::transform(fs->sequence());
 
-    OccurrenceTableInterface* occ_table;
+    // suffix array based bw transformation
+    std::string bw_transformed(sequence_size, '.');
+    const std::string& sequence = fs->sequence();
+    for (size_t i = 0; i < suffix_array.size(); i++) {
+        size_t loc = (suffix_array[i] + sequence_size - 1) % sequence_size;
+        bw_transformed[i] = sequence[loc];
+    }
+
     // if wavelet tree implementation is requested
+    OccurrenceTableInterface* occ_table;
     if (argc > 3 && strcmp(argv[3], "1") == 0) {
 
         int bucket_size = DEFAULT_BUCKET_SIZE;
@@ -50,13 +64,10 @@ int main(int argc, char *argv[]) {
 
     // build alphabet
     std::set<char> alphabet_set;
-    //alphabet_set.insert(fs->sequence().begin(), fs->sequence().end());
-    for(size_t i = 0; i < fs->sequence().size(); i++)
-        alphabet_set.insert(fs->sequence()[i]);
+    alphabet_set.insert(fs->sequence().begin(), fs->sequence().end());
     std::vector<char> alphabet(alphabet_set.begin(), alphabet_set.end());
 
     PrefixSumTableInterface* prefixsum_table = new PrefixSumTable(fs->sequence());
-    IntVector suffix_array = SuffixArray::get_sa(fs->sequence(), fs->sequence().size());
 
     // read sequence reads (FASTQ file format)
     FastqReader reads_reader(argv[2]);
@@ -64,7 +75,7 @@ int main(int argc, char *argv[]) {
         std::auto_ptr<FastaSequence> read(reads_reader.next());
         if (read.get() == NULL) break;
 
-        std::cout << "Sequence identifier: " << read->name() << std::endl;
+        std::cout << read->name() << std::endl;
         std::vector<int> indices = search(read->sequence(), alphabet, suffix_array,
             *occ_table, *prefixsum_table);
         

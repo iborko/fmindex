@@ -15,6 +15,9 @@ typedef std::vector<SuperbucketType> SuperbucketVector;
 typedef std::vector<BucketType> BucketVector;
 
 
+// Class  that performs constant-time ranking on bit strings.
+// A  bit-string 'rank' for a given index is the number of bits set
+// to {0, 1} up until and including the index.
 class BitStringRank {
 public:
     BitStringRank(const BitVector& bit_string, UInt bucket_size);

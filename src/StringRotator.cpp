@@ -8,6 +8,14 @@ StringRotator::StringRotator(const std::string& s) {
     this->end = this->last - 1;
 }
 
+StringRotator::StringRotator(const StringRotator& obj) {
+    this->s = obj.s;
+    this->length = obj.length;
+    this->last = obj.last;
+    this->begin = obj.begin;
+    this->end = obj.end;
+}
+
 void StringRotator::rotate() {
     this->begin++;
     this->end++;
@@ -18,12 +26,6 @@ void StringRotator::rotate() {
 
     if (this->end == this->last)
         this->end= this->s;
-}
-
-void StringRotator::rotate(unsigned int n) {
-    for (unsigned int i = 0; i < n; i++) {
-        this->rotate();
-    }
 }
 
 std::string StringRotator::get_str() {

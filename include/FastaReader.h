@@ -11,8 +11,8 @@ class FastSequenceInterface {
 public:
     virtual ~FastSequenceInterface() { }
     
-    virtual std::string name() = 0;
-    virtual std::string sequence() = 0;
+    virtual std::string& name() = 0;
+    virtual std::string& sequence() = 0;
 };
 
 class FastaReader;
@@ -24,9 +24,9 @@ public:
     virtual ~FastaSequence() { }
     
     // description line for fasta format
-    virtual std::string name() { return name_; }
+    virtual std::string& name() { return name_; }
     // genetic sequence
-    virtual std::string sequence() { return sequence_; }
+    virtual std::string& sequence() { return sequence_; }
     
 private:
     FastaSequence() { } // only Fasta reader can create it
