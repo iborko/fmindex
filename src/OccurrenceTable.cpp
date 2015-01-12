@@ -7,7 +7,7 @@ OccurrenceTable::OccurrenceTable(const std::string& s) {
         const char c = s[i];
         // if character c hasn't been seen before, init it's vector
         if (occ_map_.find(c) == occ_map_.end())
-            occ_map_[c].resize(s.size(), 0);
+            occ_map_[c].resize(s.size()+1, 0);
         occ_map_[c][i] = 1;
     }
 
