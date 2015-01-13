@@ -39,4 +39,5 @@ for i in xrange(args.n):
     f.write('@ %s _%d_%d_0:%d\n' % (header, start, start+args.l, i))
     f.write(sequence[start:start+args.l] + '\n')
     f.write('+\n')
-    f.write('I' * args.l + '\n')
+    # f.write('I' * args.l + '\n')  # write quality markers
+    f.write('I\n')  # no quality markers

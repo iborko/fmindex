@@ -15,9 +15,9 @@ CFLAGS := -O2 # -g -pg -Wall
 LIB := -pthread
 INC := -I include
 
-all: main test
+all: fmindex test
 
-main: $(OBJECTS_CPP) $(OBJECTS_C) $(BUILDDIR)/main.o
+fmindex: $(OBJECTS_CPP) $(OBJECTS_C) $(BUILDDIR)/main.o
 	@echo " Linking [$@]..."
 	@echo " $(CC) $^ -o bin/$@ $(LIB)"; $(CC) $^ -o bin/$@ $(LIB)
 	

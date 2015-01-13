@@ -11,7 +11,7 @@
 std::vector<int> search(
         const std::string& pattern,
         const std::vector<char>& alph,
-        std::vector<int> sa,
+        const std::vector<int>& sa,
         const OccurrenceTableInterface& occ_table,
         const PrefixSumTableInterface& ps_table) {
 
