@@ -21,6 +21,10 @@
 % koristimo zadebljane vektore, a ne strelice
 \renewcommand{\vec}[1]{\mathbf{#1}}
 
+% prikazivanje shell naredbi
+% http://tex.stackexchange.com/a/46962
+\newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
+
 % neke boje koje koristimo u formatiranju ispisa
 \usepackage{color}
 \definecolor{mygreen}{rgb}{0,0.6,0}
@@ -79,7 +83,7 @@ niza \textit{Q}. Primjerice, za niz \textit{S = "Žuti pas je opasan kad je opas
 i niz \textit{Q = "pas"} rezultati
 pretraživanja su \textit{R = \{6, 14, 28, 46\}}.
 
-U području bioinformatike pretraživanje teksta koristi se u za pronalazak
+U području bioinformatike pretraživanje teksta koristi se za pronalazak
 sekvenci unutar zadanog genoma. Definicija pretraživanja je jednaka. Specifičnost
 bioinformatičkog pretraživanja jest da su nizovi koji se pretražuju iznimno velike duljine.
 Primjerice, ljudski genom tipično sadrži oko $3.3 \times 10^9$ znakova, što bi otisnuto na
@@ -93,7 +97,7 @@ uvijek govorimo o složenosti s obzirom na duljinu pretraživanog niza \textit{S
 Nažalost, za nizove vrlo velike duljine linearno vrijeme
 znači praktično predugo trajanje pretraživanja. Otud potreba, pogotovo u području bioinformatike,
 za vremenski sub-linearnim algoritmima pretraživanja. Istovremeno, potrebno je memorijske
-zahtjeve algoritma pretraživanja zadžati što manjima.
+zahtjeve algoritma pretraživanja zadržati što manjima.
 
 U ovom projektu razmatramo implementaciju pretraživanja teksta koja se bazira na konceptu
 FM-indeksa. Konkretna implementacija bazira se na binarnim stablima valića \engl{wavelet-trees}.
@@ -216,7 +220,7 @@ BWT transforacije \textit{T\textsuperscript{BWT}} bazira se na sljedećim koncep
 \begin{itemize}
   \item{Pretraživanje se vrši po znakovima \textit{Q} unatrag (od zadnjeg prema prvom)}
   \item{Prate se početni i krajnji indeks sufiksa (\textit{SCR} tablice) unutar kojih su moguće podudarnosti}
-  \item{U svakom koraju (procesiranom znaku iz \textit{P}) se područje mogućih podudarnosti smanjuje}
+  \item{U svakom koraku (procesiranom znaku iz \textit{P}) se područje mogućih podudarnosti smanjuje}
 \end{itemize}
 
 Ako početni indeks označimo \textit{ps} \engl{pointer start}, a krajnji indeks \textit{pe}
@@ -229,7 +233,7 @@ Ako početni indeks označimo \textit{ps} \engl{pointer start}, a krajnji indeks
     \footnote{Učinkovita implementacija pretraživanja ne izvršava ovaj korak, navodimo ga
     samo radi opisa rada algoritma.}}
   \item{Izračunaj \textit{L}-indekse nađenih pojavljivanja koristeći LF-mapiranje}
-  \item{Dobivni \textit{L}-indeksi su nove vrijednost indeksa \textit{ps} i \textit{pe}}
+  \item{Dobiveni \textit{L}-indeksi su nove vrijednost indeksa \textit{ps} i \textit{pe}}
   \item{Ako postoje neobrađeni znakovi u \textit{Q}, vrati se na korak 2.}
 \end{enumerate}
 
@@ -413,10 +417,10 @@ relativno niskoj memorijskoj zahtjevnosti.
 
 \section{Implementacija}
 
-Zbog brzine izvođenja FM-indeks je implementiran u C++ programskom jeziku.
+Zbog brzine izvođenja FM-indeks je implementiran u C++ programskom jeziku, osim skripti za pokretanje generiranja sintetskih podataka i samih skripti za generiranje sintetskih podataka, koje su pisane u \textit{bash}-u, odnosno \textit{pythonu} verzije 2.
 Pojedini algoritmi su prije toga izvedeni i u Python programskom jeziku, radi
 jednostavnosti implementacije i testiranja, te potom optimalno prevedeni u
-C++.
+C++. C++ kod smo prevodili pomoću \texttt{gcc} prevodioca verzije 4.9, koji je praktički standard na \textit{unix} okruženjima. Kod prevođenja je korištena naredba \textit{-O2} prevodica.
 
 Implementacija se sastoji od BW-transformacije i potpornih struktura za LF-mapiranje.
 Pri tome je tablica prefiksnih suma \textit{C} implementirana trivijalno (ništa
@@ -425,6 +429,30 @@ trivijalno i u obliku stabla valića. Korištena je postojeća implementacija su
 polja\footnote{https://sites.google.com/site/yuta256/sais}. Napisani su UnitTestovi
 pojedinih funkcionalnosti, kao i testovi za cjelokupni FM-indeks, što uključuje
 evaluaciju vremenske i memorijske složenosti pretraživanja.
+
+Cijeli kod je objavljen na javnom \textit{GitHub} repozitoriju, na adresi \url{https://github.com/iborko/fmindex}. Cijeli kod se može preuzeti naredbom:
+\shellcmd{git clone --recursive https://github.com/iborko/fmindex}
+
+Napisana je i \textit{makefile} datoteka koja ubrzava cijeli proces prevođenja te omogućava zasebnu izgradnju izvršne datoteke s testovima (\textit{test}) i izvršne datoteke sa samom implementacijom FM indeksa (\textit{fmindex}). Automatizirani proces prevođenja koristeći \textit{Makefile} alat se pokreće upisivanjem naredbe:
+\shellcmd{make}
+u korijenskom direktoriju repozitorija. Može se pozvati i zasebno prevođenje same implementacije:
+\shellcmd{make fmindex}
+ili samo testova:
+\shellcmd{make test}
+
+\noindent Nakon prevođenja izvršne će se datoteke nalaziti u mapi \texttt{bin}. Opis korištenja:
+\shellcmd{fmindex <sequence> <reads> [<occurrence\_table> [<bucket\_size>]]}
+\begin{description}
+  \item[sequence] putanja do sekvence \engl{sequence} na kojoj se izvodi pretraživanje, u FASTA\footnote{http://en.wikipedia.org/wiki/FASTA\_format} formatu
+  \item[reads] putanja do očitanja \engl{reads} koji će se tražiti u sekvenci, FASTQ\footnote{http://en.wikipedia.org/wiki/FASTQ\_format} formatu
+  \item[occurrence\_table] može biti \textit{0} (trivijalna implementacija tablice pojavljivanja), \textit{1} (implementacija tablice pojavljivanja pomoću stabla valića)
+  \item[bucket\_size] veličina kante kod implementacije stabla valića
+\end{description}
+
+\noindent Primjer pokretanja:
+\shellcmd{fmindex Esch\_coli\_536.fna Esch\_coli\_536\_reads.fq 1 40}
+
+Za svako očitanje iz \texttt{<reads>} datoteke, program generira dvije linije. Prva linija je header tog očitka iz \texttt{<reads>} datoteke, a druga linija je niz indeksa položaja tog očitka u \texttt{<sequence>} datoteci. Indeksi su odvojeni razmakom. Izlaz se ispisuje na standardni izlaz \engl{stdout}.
 
 \section{Testiranje}
 
@@ -436,9 +464,17 @@ nasumičnim podatcima. Uspoređuju se trivijalne implementacije (jednostavne za 
 ali vremenski i memorijski neefikasne) sa produkcijskim algoritmima. U trenutku pisanja
 UnitTestovi indiciraju da su sve produkcijske funkcionalnosti ispravno implementirane.
 
+Unit testovi su napisani koristeći \textit{Catch}\footnote{https://github.com/philsquared/Catch} modul za C++ jezik koji se nalazi u mapi \texttt{include/catch}. 
+
 Testiranje cjelokupnog FM-indeksa s obzirom na vremensku i memorijsku složenost
 pretraživanja izvršeno je nad sintetiziranim podatcima, kao i nad 
 javno dostupnim genom bakterije \textit{Escherichia coli}\footnote{http://bacteria.ensembl.org/index.html}.
+
+Skripta \texttt{test\_run.sh} se koristi za pokretanje programa na nekoj testnoj sekvenci. Testne sekvence se nalaze u \texttt{test\_data} folderu. Skripta najprije generira skupove od 1000, 5000, 10000, 50000, 100000, 500000 i 1000000 očitanja \engl{reads} duljine 80 parova baza. Nakon toga pokreće \textit{fmindex} program nad svakim skupom i ispisuje vršnu potrošnju radne memorije i proteklo vrijeme.
+
+\noindent Primjer:
+\shellcmd{test\_run.sh test\_data/Esch\_coli\_536.fna}
+
 
 \subsection{Rezultati}
 

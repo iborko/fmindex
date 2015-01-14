@@ -23,6 +23,7 @@ Binary will be located in `bin` folder (`fmindex`). Usage:
 Example:  
 &nbsp;&nbsp;&nbsp;&nbsp;`fmindex Esch_coli_536.fna Esch_coli_536_reads.fq 1 40`  
 
+For every read from `<reads>` program generates two lines. First line is the FASTQ header and the second line is the list of all position indices of the current read in `<sequence>`. Indices are splitted with whitespaces.
 
 Script `test_run.sh` can be used to run program on one of the example sequence. Example sequences are located in the `test_data` folder.
 
