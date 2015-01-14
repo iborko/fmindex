@@ -5,6 +5,7 @@ CC := g++ # This is the main compiler
 # CC := clang --analyze # and comment out the linker last line for sanity
 SRCDIR := src
 BUILDDIR := build
+BINDIR := bin
 	
 # classes start with Uppercase lesser
 SOURCES_CPP := $(shell find $(SRCDIR) -type f -name [[:upper:]]*.cpp)
@@ -18,12 +19,14 @@ INC := -I include
 all: fmindex test
 
 fmindex: $(OBJECTS_CPP) $(OBJECTS_C) $(BUILDDIR)/main.o
+	@mkdir -p $(BINDIR)
 	@echo " Linking [$@]..."
-	@echo " $(CC) $^ -o bin/$@ $(LIB)"; $(CC) $^ -o bin/$@ $(LIB)
+	@echo " $(CC) $^ -o $(BINDIR)/$@ $(LIB)"; $(CC) $^ -o $(BINDIR)/$@ $(LIB)
 	
 test: $(OBJECTS_CPP) $(OBJECTS_C) $(BUILDDIR)/test.o
+	@mkdir -p $(BINDIR)
 	@echo " Linking [$@]..."
-	@echo " $(CC) $^ -o bin/$@ $(LIB)"; $(CC) $^ -o bin/$@ $(LIB)
+	@echo " $(CC) $^ -o $(BINDIR)/$@ $(LIB)"; $(CC) $^ -o $(BINDIR)/$@ $(LIB)
 
 # build of cpp files (only classes)
 $(BUILDDIR)/%_cpp.o: $(SRCDIR)/%.cpp
