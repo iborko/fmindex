@@ -470,7 +470,9 @@ Testiranje cjelokupnog FM-indeksa s obzirom na vremensku i memorijsku složenost
 pretraživanja izvršeno je nad sintetiziranim podatcima, kao i nad 
 javno dostupnim genom bakterije \textit{Escherichia coli}\footnote{http://bacteria.ensembl.org/index.html}.
 
-Skripta \texttt{test\_run.sh} se koristi za pokretanje programa na nekoj testnoj sekvenci. Testne sekvence se nalaze u \texttt{test\_data} folderu. Skripta najprije generira skupove od 1000, 5000, 10000, 50000, 100000, 500000 i 1000000 očitanja \engl{reads} duljine 80 parova baza. Nakon toga pokreće \textit{fmindex} program nad svakim skupom i ispisuje vršnu potrošnju radne memorije i proteklo vrijeme.
+Skripta \texttt{test\_run.sh} se koristi za pokretanje programa na nekoj testnoj sekvenci. Testne sekvence se nalaze u mapi \texttt{test\_data}. Skripta najprije generira skupove od 1000, 5000, 10000, 50000, 100000, 500000 i 1000000 očitanja \engl{reads} duljine 80 znakova.
+Svako generirano očitanje ima u FASTQ headeru indeks početka u originalnoj sekvenci, tako da se kasnije može usporediti s pripadnom .out datotekom.
+Nakon toga pokreće \textit{fmindex} program nad svakim skupom i ispisuje vršnu potrošnju radne memorije i proteklo vrijeme. Skripta sprema izlaze u .out datoteke u mapu \texttt{test\_data}.
 
 \noindent Primjer:
 \shellcmd{test\_run.sh test\_data/Esch\_coli\_536.fna}
