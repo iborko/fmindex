@@ -1,0 +1,10 @@
+# za Esch coli test s raznim read_lengthovima
+# 100 000 searches, bucket_size 20, ovdje je index build time konstantno
+# (read length, time (s) )
+10      1.88
+50      2.80
+100     4.45
+500     15.4
+1000    29.9
+5000    123
+10000   261

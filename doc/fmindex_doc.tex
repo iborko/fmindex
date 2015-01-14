@@ -411,6 +411,90 @@ relativno niskoj memorijskoj zahtjevnosti.
 
 \chapter{Implementacija i testiranje}
 
+\section{Implementacija}
+
+Zbog brzine izvođenja FM-indeks je implementiran u C++ programskom jeziku.
+Pojedini algoritmi su prije toga izvedeni i u Python programskom jeziku, radi
+jednostavnosti implementacije i testiranja, te potom optimalno prevedeni u
+C++.
+
+Implementacija se sastoji od BW-transformacije i potpornih struktura za LF-mapiranje.
+Pri tome je tablica prefiksnih suma \textit{C} implementirana trivijalno (ništa
+drugo nije potrebno), a tablica pojavljivanja \textit{Occ} je implementirana
+trivijalno i u obliku stabla valića. Korištena je postojeća implementacija sufiksnog
+polja\footnote{https://sites.google.com/site/yuta256/sais}. Napisani su UnitTestovi
+pojedinih funkcionalnosti, kao i testovi za cjelokupni FM-indeks, što uključuje
+evaluaciju vremenske i memorijske složenosti pretraživanja.
+
+\section{Testiranje}
+
+\subsection{Oblici testiranja}
+
+UnitTestovi pojedinih funkcionalnosti (primjerice stabla valića i binarnog ranka) pisani su
+kako bi se utvrdila njihova ispravnost. Pri tome se testiralo nad sintetiziranim,
+nasumičnim podatcima. Uspoređuju se trivijalne implementacije (jednostavne za napisati,
+ali vremenski i memorijski neefikasne) sa produkcijskim algoritmima. U trenutku pisanja
+UnitTestovi indiciraju da su sve produkcijske funkcionalnosti ispravno implementirane.
+
+Testiranje cjelokupnog FM-indeksa s obzirom na vremensku i memorijsku složenost
+pretraživanja izvršeno je nad sintetiziranim podatcima, kao i nad 
+javno dostupnim genom bakterije \textit{Escherichia coli}\footnote{http://bacteria.ensembl.org/index.html}.
+
+\subsection{Rezultati}
+
+\subsubsection{Vremenska složenost}
+
+Slika \ref{fig:test_res_seq_len_time} prikazuje
+trajanje pretraživanja u ovisnosti o duljini indeksiranog niza.
+Testiranje je rađeno nad sintetskim podatcima.
+Pretraživana su pojavljivanja isječaka duljine 80 znakova unutar nizova duljina u rasponu
+$[5 * 10^3, 10^7]$ (svaka potencija broja $2$ unutar tog raspona). Rezultirajuće vrijeme je trajanje
+pojedine pretrage dobiveno kao prosjek od $10^5$ pretraga.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{fig/test_res_seq_len.pdf}
+\caption{Vrijeme pretraživanja u ovisnosti o duljini indeksiranog niza.}
+\label{fig:test_res_seq_len_time}
+\end{figure}
+
+Rezultati su pomalo iznenađujući, s obzirom na teorijsko razmatranje konstantne složenosti
+pretraživanja s obzirom na duljinu indeksiranog niza. U \cite{singer_2012} je observiran
+isti fenomen, a objašnjen je kao posljedica hardverskog baratanja priručnom memorijom. Pri indeksiranju
+nizova vrlo velike duljine, memorijski zahtjevi strukture indeksa postaju preveliki da bi
+te strukture stale u priručnu memoriju. Prijenos podataka preko raznih razina priručne memorije
+vremenski je zahtjevan i stoga snažno utječe na performase pretraživanja.
+
+Slika \ref{fig:test_res_query_len_time} prikazuje trajanje pretraživanja
+s obzirom na duljinu niza koji se traži (query). Testiranje je rađeno nad genomom
+bakterije \textit{Escherichia coli}. Rezultati su srednje vrijednosti $10^5$ pretraga.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{fig/test_res_query_len.pdf}
+\caption{Vrijeme pretraživanja u ovisnosti o duljini indeksiranog niza.}
+\label{fig:test_res_query_len_time}
+\end{figure}
+
+Rezultati su u skladu sa teorijskom analizom složenosti. Vidimo linearni porast
+trajanja pretrage s obzirom na duljinu niza koji se pretražuje.
+
+\subsubsection{Memorijska složenost}
+
+Utrošak memorije na potporne strukture FM-indeksa prikazan je na slici \ref{fig:test_res_seq_len_mem}.
+Testiranje memorije je rađeno sa istim podatcima kao i testiranje vremena trajanja pregrage.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{fig/test_res_seq_len_mem.pdf}
+\caption{Utrošak memorije u ovisnosti o duljini indeksiranog niza.}
+\label{fig:test_res_seq_len_mem}
+\end{figure}
+
+Iz grafa \ref{fig:test_res_seq_len_mem} vidljivo je kako je utrošak memorije s obzirom na
+duljinu indeksiranog niza asimptotski linearan (primjetimo da su obje osi grafa logaritamske skale).
+Rezultati su u skladu sa teorijskim razmatranjem memorijske potrošnje FM-indeks struktura podataka.
+
 \chapter{Zaključak}
 Zaključak.
 
