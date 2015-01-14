@@ -532,12 +532,23 @@ duljinu indeksiranog niza asimptotski linearan (primjetimo da su obje osi grafa 
 Rezultati su u skladu sa teorijskim razmatranjem memorijske potrošnje FM-indeks struktura podataka.
 
 \chapter{Zaključak}
-Zaključak.
+
+Velike količine informacija koje su dio današnjeg svakodnevnog života definiraju potrebu
+za učinkovitim načinom pretraživanja. Istovremeno, znanost u području genetskog istraživanja
+radi sa tekstualnim nizovima enormnih duljina, nad kojima je potrebno vršiti velike količine
+pretraga. Efikasni algoritmi pretraživanja teksta, koji ne ovise o duljini tog teksta,
+praktički su neophodni.
+
+Unutar ovog rada implementirali smo FM-indeks algoritam i potporne podatkovne strukture.
+Radi se o indeksu koji omogućava pretraživanje teksta brzinom neovisnom o duljini tog
+teksta, već samo o duljini niza koji se traži. Istovremeno je memorijski utrošak
+indeksa prihvatljive veličine. Implementirali smo BW-transformaciju te stablo valića
+kao osnove FM-indeksa. Isto tako smo kao alternativu BW-transformaciji koristili
+jednu od poznatijih implementacija sufiksnog polja. Izvršili smo testiranje vremenske
+složenosti pretraživanja, kao i memorijskog utroška FM-indeksa, koje je potvrdilo očekivane
+rezultate.
 
 \bibliography{literatura}
 \bibliographystyle{unsrt}
-
-\chapter{Sažetak}
-Sažetak.
 
 \end{document}
