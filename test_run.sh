@@ -33,5 +33,5 @@ fi
 for n in "${read_n[@]}"
 do
     echo "/usr/bin/time -v bin/fmindex ${1} ${1}.reads${n} 1 20 2>&1"
-    /usr/bin/time -v bin/fmindex ${1} ${1}.reads${n} 1 20 2>&1 | grep -E 'User time|Maximum resident'
+    /usr/bin/time -v bin/fmindex ${1} ${1}.reads${n} 1 20 2>&1 1>${1}.out${n} | grep -E 'User time|Maximum resident'
 done
