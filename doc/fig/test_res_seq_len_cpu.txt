@@ -1,0 +1,13 @@
+# usporedba brzine, wavelet tree vs trivial
+# (x / time(s) wavelet tree / time (s) trivial )
+13  1.92    0.49
+14  1.93    0.56
+15  1.95    0.55
+16  1.99    0.54
+17  1.96    0.59
+18  1.99    0.80
+19  2.15    0.90
+20  2.32    1.04
+21  2.53    1.28
+22  3.31    1.86
+23  5.26    3.04

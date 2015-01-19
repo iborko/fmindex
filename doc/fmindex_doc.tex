@@ -251,7 +251,7 @@ za izravnu računalnu implementaciju može se naći u radu \cite{singer_2012}. S
 \section{Složenost pretraživanja}
 
 Glavni razlog za razvoj FM-indeksa je povećanje efikasnosti pretraživanja dugih nizova
-(poput genotipa). U ovom poglavlju će se razmotriti teoretska složenost pretraživanja korištenjem
+(poput genoma). U ovom poglavlju će se razmotriti teoretska složenost pretraživanja korištenjem
 FM-indeksa. Pri tome nas zanima složenost korištenja
 izgrađenog indeksa za neki niz, a ne složenost stvaranja indeksa.
 
@@ -322,7 +322,7 @@ znakove koji su veći ili jednaki (pri tome se u čvoru ne pohranjuje originalni
 samo binarni). Znakovi originalnog niza označeni nulama sačinjavaju lijevo
 dijete čvora, a oni označeni jedinicama desno. Čvorovi se kreiraju samo ako sadrže dva ili više
 različita znaka (za niz proizvoljne duljine začinjen od samo jednog znaka se ne stvara stablo).
- Primjer binarnog stabla za genotipski niz "AGCTAGCTCATACAGGGTATGACCAGTACGACAG"
+ Primjer binarnog stabla za niz "AGCTAGCTCATACAGGGTATGACCAGTACGACAG"
 prikazan je na slici \ref{fig:wavelet_ex1}.
 
 \begin{figure}[!htb]
@@ -368,17 +368,17 @@ brzog rangiranja binarnog niza. Problem rangiranja binarnog niza jednostavniji
 je jer postoje samo dva znaka abecede. Pri tome je potrebno rangirati samo jedan
 znak (primjerice znak 1) jer se rang drugog znaka dobiva kao \textit{rank(T, 0, i)
 = i - rank(T, 1, i)}. Konstantna vremenska složenost ovakvog rangiranja ostvaruje
-se grupiranjem niza u "kante" duljine \textit{k}. Za svaku kantu se prati broj
-jedinica sadržanih u svim prethodnim kantama. Time se za svaki \textit{i} rangiranje
-obavlja određivanjem kante kojoj \textit{i} pripada, običnim prebrojavanjem jedinica
+se grupiranjem niza u "pretince" duljine \textit{k}. Za svaki pretinac se prati broj
+jedinica sadržanih u svim prethodnim pretincima. Time se za svaki \textit{i} rangiranje
+obavlja određivanjem pretinca kojoj \textit{i} pripada, običnim prebrojavanjem jedinica
 do pozicije \textit{i} samo unutar
-te kante, te pribrajanjem broja jedinica sadržanih u prethodnim kantama. Time je
-prebrojavanje (iteracija po znakovima) ograničeno na veličinu kante, ne ovisi više
+tog pretinca, te pribrajanjem broja jedinica sadržanih u prethodnim pretincima. Time je
+prebrojavanje (iteracija po znakovima) ograničeno na veličinu pretinca, ne ovisi više
 o duljini originalnog niza. Ovakvo rangiranje stoga ima konstantnu vremensku složenost s obzirom
 na duljinu originalnog niza.
 
 Konkretna implementacija opisanog rangiranja je malo složenija jer se zbog
-memorijske učinkovitosti koriste kante i "super-kante", ali je konceptualno
+memorijske učinkovitosti koriste pretinci i "super-pretinci", ali je konceptualno
 identična i vremenski jednako efikasna.
 
 \subsection{Vremenska složenost rangiranja stablem valića}
@@ -446,7 +446,7 @@ ili samo testova:
   \item[sequence] putanja do sekvence \engl{sequence} na kojoj se izvodi pretraživanje, u FASTA\footnote{http://en.wikipedia.org/wiki/FASTA\_format} formatu
   \item[reads] putanja do očitanja \engl{reads} koji će se tražiti u sekvenci, FASTQ\footnote{http://en.wikipedia.org/wiki/FASTQ\_format} formatu
   \item[occurrence\_table] može biti \textit{0} (trivijalna implementacija tablice pojavljivanja), \textit{1} (implementacija tablice pojavljivanja pomoću stabla valića)
-  \item[bucket\_size] veličina kante kod implementacije stabla valića
+  \item[bucket\_size] veličina pretinca kod implementacije stabla valića
 \end{description}
 
 \noindent Primjer pokretanja:
@@ -484,15 +484,20 @@ Nakon toga pokreće \textit{fmindex} program nad svakim skupom i ispisuje vršnu
 
 Slika \ref{fig:test_res_seq_len_time} prikazuje
 trajanje pretraživanja u ovisnosti o duljini indeksiranog niza.
-Testiranje je rađeno nad sintetskim podatcima.
-Pretraživana su pojavljivanja isječaka duljine 80 znakova unutar nizova duljina u rasponu
+Testiranje je rađeno nad sintetskim podatcima. Prikazane su brzine pretraživanja za FM-indeks
+implementran korištenjem trivijalne implementacije \textit{Occ} tablice, kao i brzine za indeks
+koji koristi stablo valića. U implementaciji sa stablom valića su pretinci korišteni za binarno rangiranje
+veličine $20$.
+Pretraživana su pojavljivanja očitaka duljine 80 znakova unutar nizova duljina u rasponu
 $[5 * 10^3, 10^7]$ (svaka potencija broja $2$ unutar tog raspona). Rezultirajuće vrijeme je trajanje
 pojedine pretrage dobiveno kao prosjek od $10^5$ pretraga.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\textwidth]{fig/test_res_seq_len.pdf}
-\caption{Vrijeme pretraživanja u ovisnosti o duljini indeksiranog niza.}
+\includegraphics[width=\textwidth]{fig/test_res_seq_len_cpu.pdf}
+\caption{Vrijeme pretraživanja u ovisnosti o duljini indeksiranog niza, pretražuju se očitci duljine 80 znakova.
+  Testiranje FM-indeksa sa trivijalnom \textit{Occ} tablicom, naspram indeksa sa stablom valića.
+  Pretinci za binarno rangiranje u stablu valića su veličine 20.}
 \label{fig:test_res_seq_len_time}
 \end{figure}
 
@@ -504,33 +509,44 @@ te strukture stale u priručnu memoriju. Prijenos podataka preko raznih razina p
 vremenski je zahtjevan i stoga snažno utječe na performase pretraživanja.
 
 Slika \ref{fig:test_res_query_len_time} prikazuje trajanje pretraživanja
-s obzirom na duljinu niza koji se traži (query). Testiranje je rađeno nad genomom
-bakterije \textit{Escherichia coli}. Rezultati su srednje vrijednosti $10^5$ pretraga.
+s obzirom na duljinu očitka \engl{read-length} koji se traži. Testiranje je rađeno nad genomom
+bakterije \textit{Escherichia coli}, duljine $4.9 * 10^6$ znakova.
+FM-indeks koristi stablo valića s pretincima binarnog rangiranja
+veličine 20. Rezultati su srednje vrijednosti $10^5$ pretraga.
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{fig/test_res_query_len.pdf}
-\caption{Vrijeme pretraživanja u ovisnosti o duljini indeksiranog niza.}
+\caption{Vrijeme pretraživanja u ovisnosti o duljini očitka. Pretražuje se genom
+  bakterije \textit{Escherichia coli}, duljine $4.9 * 10^6$ znakova.
+  Pretinci za binarno rangiranje u stablu valića su veličine 20.}
 \label{fig:test_res_query_len_time}
 \end{figure}
 
 Rezultati su u skladu sa teorijskom analizom složenosti. Vidimo linearni porast
-trajanja pretrage s obzirom na duljinu niza koji se pretražuje.
+trajanja pretrage s obzirom na duljinu očitka.
 
 \subsubsection{Memorijska složenost}
 
 Utrošak memorije na potporne strukture FM-indeksa prikazan je na slici \ref{fig:test_res_seq_len_mem}.
-Testiranje memorije je rađeno sa istim podatcima kao i testiranje vremena trajanja pregrage.
+Testiranje je rađeno nad sintetskim podatcima. Prikazan je utrošak memorije za FM-indeks
+implementran korištenjem trivijalne implementacije \textit{Occ} tablice, kao i utrošak za indeks
+koji koristi stablo valića. U implementaciji sa stablom valića su pretinci korišteni za binarno rangiranje
+veličine $20$. Mjerena je potrošnja memorije cijelog programa.
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{fig/test_res_seq_len_mem.pdf}
-\caption{Utrošak memorije u ovisnosti o duljini indeksiranog niza.}
+\caption{Utrošak memorije čitavog programa u ovisnosti o duljini indeksiranog niza.
+  Testiranje FM-indeksa sa trivijalnom \textit{Occ} tablicom, naspram indeksa sa stablom valića.
+  Pretinci za binarno rangiranje u stablu valića su veličine 20.}
 \label{fig:test_res_seq_len_mem}
 \end{figure}
 
 Iz grafa \ref{fig:test_res_seq_len_mem} vidljivo je kako je utrošak memorije s obzirom na
 duljinu indeksiranog niza asimptotski linearan (primjetimo da su obje osi grafa logaritamske skale).
+Vidljivo je kako implementacija FM-indeksa bazirana na stablu valića koristi manje od pola memorije
+trivijalne implementacije, za dugačke nizove.
 Rezultati su u skladu sa teorijskim razmatranjem memorijske potrošnje FM-indeks struktura podataka.
 
 \chapter{Zaključak}
@@ -543,7 +559,7 @@ praktički su neophodni.
 
 Unutar ovog rada implementirali smo FM-indeks algoritam i potporne podatkovne strukture.
 Radi se o indeksu koji omogućava pretraživanje teksta brzinom neovisnom o duljini tog
-teksta, već samo o duljini niza koji se traži. Istovremeno je memorijski utrošak
+teksta, već samo o duljini niza očitka. Istovremeno je memorijski utrošak
 indeksa prihvatljive veličine. Implementirali smo BW-transformaciju te stablo valića
 kao osnove FM-indeksa. Isto tako smo kao alternativu BW-transformaciji koristili
 jednu od poznatijih implementacija sufiksnog polja. Izvršili smo testiranje vremenske
