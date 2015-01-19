@@ -1,3 +1,8 @@
+// Copyright 2015 iborko
+// Distributed under MIT license
+// See file LICENSE for detail or copy at
+// https://raw.githubusercontent.com/iborko/fmindex/master/LICENSE
+
 #include <iostream>
 #include <cassert>
 
