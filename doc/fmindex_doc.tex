@@ -423,12 +423,16 @@ jednostavnosti implementacije i testiranja, te potom optimalno prevedeni u
 C++. C++ kod smo prevodili pomoću \texttt{gcc} prevodioca verzije 4.9, koji je praktički standard na \textit{unix} okruženjima. Kod prevođenja je korištena naredba \textit{-O2} prevodica.
 
 Implementacija se sastoji od BW-transformacije i potpornih struktura za LF-mapiranje.
-Pri tome je tablica prefiksnih suma \textit{C} implementirana trivijalno (ništa
+BW-transformacija je implementirana kao dokaz koncepta i za testiranje ispravnosti algoritma.
+Pri testiranju složenosti pretaživanja koristi se postojeća implementacija sufiksnog
+polja\footnote{https://sites.google.com/site/yuta256/sais}.
+Tablica prefiksnih suma \textit{C} implementirana je trivijalno (ništa
 drugo nije potrebno), a tablica pojavljivanja \textit{Occ} je implementirana
-trivijalno i u obliku stabla valića. Korištena je postojeća implementacija sufiksnog
-polja\footnote{https://sites.google.com/site/yuta256/sais}. Napisani su UnitTestovi
+trivijalno i u obliku stabla valića. Napisani su UnitTestovi
 pojedinih funkcionalnosti, kao i testovi za cjelokupni FM-indeks, što uključuje
-evaluaciju vremenske i memorijske složenosti pretraživanja.
+evaluaciju vremenske i memorijske složenosti pretraživanja. Pri testiranju
+složenosti uspoređuju se trivijalna implementacija \textit{Occ} tablica i
+stablo valića.
 
 Cijeli kod je objavljen na javnom \textit{GitHub} repozitoriju, na adresi \url{https://github.com/iborko/fmindex}. Cijeli kod se može preuzeti naredbom:
 \shellcmd{git clone --recursive https://github.com/iborko/fmindex}
